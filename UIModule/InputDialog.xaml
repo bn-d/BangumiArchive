@@ -1,0 +1,20 @@
+﻿<ContentDialog
+    x:Class="AnimeArchive.UIModule.InputDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Add New Anime"
+    PrimaryButtonText="Add"
+    SecondaryButtonText="Cancel"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
+    SecondaryButtonClick="ContentDialog_SecondaryButtonClick">
+
+    <Grid>
+        <TextBox x:Name="Inbox" x:FieldModifier="public"
+                 Text="{Binding ElementName=ContentDialog, Path=Text, Mode=TwoWay}"
+                 IsSpellCheckEnabled="False"
+                 PlaceholderText="Anime Name" FontSize="22"/>
+    </Grid>
+</ContentDialog>
