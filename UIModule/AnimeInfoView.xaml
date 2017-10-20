@@ -7,6 +7,12 @@
     mc:Ignorable="d"
     RequestedTheme="Dark">
 
+    <Page.Transitions>
+        <TransitionCollection>
+            <NavigationThemeTransition/>
+        </TransitionCollection>
+    </Page.Transitions>
+
     <Grid>
         <ScrollViewer Background="{x:Null}" BorderBrush="{x:Null}" VerticalScrollBarVisibility="Hidden">
             <StackPanel x:Name="AnimeInfoList" Margin="0,50,0,0" >
@@ -14,10 +20,10 @@
                         HorizontalAlignment="Center" Margin="0,0,0,20">
                     <Button x:Name="AnimeFlag" Click="ChangeFlag" Height="40" Width="40">
                         <Button.Background>
-                            <ImageBrush Stretch="Uniform" ImageSource="{x:Bind curAnime.Flag}"/>
+                            <ImageBrush Stretch="Uniform" ImageSource="{x:Bind _curAnime.Flag}"/>
                         </Button.Background>
                     </Button>
-                    <Button Content="{x:Bind curAnime.Index}"  
+                    <Button Content="{x:Bind _curAnime.Index}"  
                         FontSize="36"
                         HorizontalAlignment="Right" VerticalAlignment="Center"
                         MinWidth="50" Background="{x:Null}" BorderBrush="{x:Null}">
@@ -36,14 +42,14 @@
                            Width="5" Margin="0,20" VerticalAlignment="Stretch"/>
                     <StackPanel>
                         <TextBox x:Name="TitleTB"
-                        Text="{x:Bind curAnime.Title, Mode=TwoWay}" 
+                        Text="{x:Bind _curAnime.Title, Mode=TwoWay}" 
                              Style="{StaticResource TBStyle}" 
                              FontSize="36"
                              MinWidth="500" PlaceholderText="Anime Title"
                              LostFocus="TrimText"/>
                         <Rectangle Height="3" Fill="White"/>
                         <TextBox x:Name="SubTitleTB"
-                        Text="{x:Bind curAnime.SubTitle, Mode=TwoWay}" 
+                        Text="{x:Bind _curAnime.SubTitle, Mode=TwoWay}" 
                              Style="{StaticResource TBStyle}" 
                              MinWidth="500"
                              LostFocus="TrimText"/>
@@ -52,15 +58,15 @@
 
                 <StackPanel Orientation="Horizontal" 
                         VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,0,0,20">
-                    <CheckBox IsChecked="{x:Bind curAnime.IsWatching, Mode=TwoWay}"
+                    <CheckBox IsChecked="{x:Bind _curAnime.IsWatching, Mode=TwoWay}"
                           Content="Watching" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-                    <CheckBox IsChecked="{x:Bind curAnime.IsLive, Mode=TwoWay}"
+                    <CheckBox IsChecked="{x:Bind _curAnime.IsLive, Mode=TwoWay}"
                           Content="Live" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                 </StackPanel>
 
-                <ListView x:Name="SeaonList"
-                ItemsSource="{x:Bind curAnime.Seasons}" ItemTemplate="{StaticResource SeasonItem}"
-                      Margin="100,0" HorizontalAlignment="Center"/>
+                <ListView x:Name="SeaonList" 
+                          ItemsSource="{x:Bind _curAnime.Seasons}" ItemTemplate="{StaticResource SeasonItem}"
+                      Margin="100,0" HorizontalAlignment="Center" SelectionMode="None"/>
             </StackPanel>
         </ScrollViewer>
 
@@ -76,10 +82,18 @@
             <AppBarButton Icon="Remove" Label="" Click="RemoveSeason"/>
             <AppBarButton Icon="Save" Label="" Click="SaveAnime"/>
         </CommandBar>
-        
-        <AppBarButton Icon="Previous" Click="PreviousAnime"
-                      VerticalAlignment="Center" HorizontalAlignment="Left"/>
-        <AppBarButton Icon="Next" Click="NextAnime"
-                      VerticalAlignment="Center" HorizontalAlignment="Right"/>
+
+        <AppBarButton Click="PreviousAnime"
+                      VerticalAlignment="Center" HorizontalAlignment="Left">
+            <AppBarButton.Icon>
+                <FontIcon Glyph="&#59243;"/>
+            </AppBarButton.Icon>
+        </AppBarButton>
+        <AppBarButton Click="NextAnime"
+                      VerticalAlignment="Center" HorizontalAlignment="Right">
+            <AppBarButton.Icon>
+                <FontIcon Glyph="&#59244;"/>
+            </AppBarButton.Icon>
+        </AppBarButton>
     </Grid>
 </Page>

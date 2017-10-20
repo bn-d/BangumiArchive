@@ -16,7 +16,7 @@ namespace AnimeArchive.UIModule
     public sealed partial class AnimeInfoView : Page
     {
         // The object of current anime
-        private Anime curAnime;
+        private Anime _curAnime;
 
         public AnimeInfoView()
         {
@@ -31,8 +31,8 @@ namespace AnimeArchive.UIModule
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             int indx = (int) e.Parameter;
-            curAnime = Global.Animes[indx];
-            RankBar.Fill = Anime.GetRankColorBrush(curAnime.Rank);
+            _curAnime = Global.Animes[indx];
+            RankBar.Fill = Anime.GetRankColorBrush(_curAnime.Rank);
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace AnimeArchive.UIModule
         /// <param name="e"></param>
         private void AddSeason(object sender, RoutedEventArgs e)
         {
-            curAnime.Seasons.Add(new Season());
+            _curAnime.Seasons.Add(new Season());
         }
 
         /// <summary>
@@ -62,38 +62,8 @@ namespace AnimeArchive.UIModule
         /// <param name="e"></param>
         private void RemoveSeason(object sender, RoutedEventArgs e)
         {
-            if (curAnime.Seasons.Any())
-                curAnime.Seasons.RemoveAt(curAnime.Seasons.Count() - 1);
-        }
-
-        /// <summary>
-        /// Save the entire anime list
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void SaveAnime(object sender, RoutedEventArgs e)
-        {
-            AnimeManager.WriteAnime();
-        }
-
-        /// <summary>
-        /// Export anime to user selected location
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ExportAnime(object sender, RoutedEventArgs e)
-        {
-            AnimeManager.ExportAnime();
-        }
-
-        /// <summary>
-        /// Import anime from user selected file
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ImportAnime(object sender, RoutedEventArgs e)
-        {
-            AnimeManager.ImportAnime();
+            if (_curAnime.Seasons.Any())
+                _curAnime.Seasons.RemoveAt(_curAnime.Seasons.Count() - 1);
         }
 
         /// <summary>
@@ -103,8 +73,8 @@ namespace AnimeArchive.UIModule
         /// <param name="e"></param>
         private void ChangeRank(object sender, RoutedEventArgs e)
         {
-            curAnime.Rank = int.Parse(((MenuFlyoutItem)sender).Text);
-            RankBar.Fill = Anime.GetRankColorBrush(curAnime.Rank);
+            _curAnime.Rank = int.Parse(((MenuFlyoutItem)sender).Text);
+            RankBar.Fill = Anime.GetRankColorBrush(_curAnime.Rank);
         }
 
         /// <summary>
@@ -129,33 +99,44 @@ namespace AnimeArchive.UIModule
             IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.Read);
             DataReader reader = new DataReader(stream.GetInputStreamAt(0));
             await reader.LoadAsync((uint) stream.Size);
-            curAnime.FlagByte = new byte[stream.Size];
-            reader.ReadBytes(curAnime.FlagByte);
+            _curAnime.FlagByte = new byte[stream.Size];
+            reader.ReadBytes(_curAnime.FlagByte);
 
             Bindings.Update();
         }
 
         /// <summary>
-        /// Trim text for text box
+        /// Navigate to previous anime
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void TrimText(object sender, RoutedEventArgs e)
-        {
-            TextBox TB = (TextBox)sender;
-            TB.Text = TB.Text.Trim();
-        }
-
         private void PreviousAnime(object sender, RoutedEventArgs e)
         {
-            if (curAnime.Index > 1)
-                Frame.Navigate(typeof(AnimeInfoView), curAnime.Index - 2);
+            if (_curAnime.Index > 1)
+                Frame.Navigate(typeof(AnimeInfoView), _curAnime.Index - 2);
         }
 
+        /// <summary>
+        /// Navigate to next anime
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void NextAnime(object sender, RoutedEventArgs e)
         {
-            if (curAnime.Index < Global.Animes.Count())
-                Frame.Navigate(typeof(AnimeInfoView), curAnime.Index);
+            if (_curAnime.Index < Global.Animes.Count())
+                Frame.Navigate(typeof(AnimeInfoView), _curAnime.Index);
         }
+
+        private void SaveAnime(object sender, RoutedEventArgs e) =>
+            AnimeManager.WriteAnime();
+
+        private void ExportAnime(object sender, RoutedEventArgs e) =>
+            AnimeManager.ExportAnime();
+
+        private void ImportAnime(object sender, RoutedEventArgs e) =>
+            AnimeManager.ImportAnime();
+
+        private void TrimText(object sender, RoutedEventArgs e) =>
+            UIDictionary.TrimTextHelper(sender, e);
     }
 }

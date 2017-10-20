@@ -8,30 +8,80 @@
     RequestedTheme="Dark"
     NavigationCacheMode="Enabled">
 
-    <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled">
-        <GridView x:Name="AnimeGrid" ItemsSource="{x:Bind Animes}"
-                  VerticalContentAlignment="Top" Padding="0,50"
-                  ScrollViewer.VerticalScrollBarVisibility="Hidden" 
-                  IsItemClickEnabled="True" ItemClick="AnimeListView_ItemClick"
-                  ItemTemplate="{StaticResource AnimeGridItem}"/>
-        
-        <CommandBar Background="{x:Null}" Margin="15,0,0,0">
-            <CommandBar.Content>
-                <AutoSuggestBox x:Name="AnimeSearchBox" Grid.Row ="2" 
-                                    HorizontalAlignment="Left" VerticalAlignment="Center" Width="300" 
-                                    PlaceholderText="Search for Anime" FontSize="18" HorizontalContentAlignment="Left"
-                                    QueryIcon="Find" Margin="0,5,0,0"
-                                    TextChanged="SearchTextChanged" QuerySubmitted="SearchQuerySubmitted"/>
-            </CommandBar.Content>
-            <CommandBar.SecondaryCommands>
-                <AppBarButton Label="Scroll To" Click="ScrollTo"/>
-                <AppBarButton Label="Export" Click="ExportAnime"/>
-                <AppBarButton Label="Import" Click="ImportAnime"/>
-            </CommandBar.SecondaryCommands>
+    <Page.Transitions>
+        <TransitionCollection>
+            <NavigationThemeTransition/>
+        </TransitionCollection>
+    </Page.Transitions>
 
-            <AppBarButton Icon="Add" Label="" Click="AddAnimeAsync"/>
-            <AppBarButton Icon="Up" Label="" Click="ScrollToTop"/>
-            <AppBarButton Icon="Save" Label="" Click="SaveAnime"/>
-        </CommandBar>
-    </Grid>
+    <SplitView x:Name="FilterSplitView" DisplayMode="Inline" Template="{StaticResource SplitViewControlInlineTemplate}" OpenPaneLength="250">
+        <SplitView.Pane>
+            <StackPanel Margin="20,10,0,0" HorizontalAlignment="Left">
+                <CheckBox x:Name="WatchingCB" Content="Currently Watching"/>
+                <CheckBox x:Name="NWatchedCB" Content="Never Watched"/>
+                
+                <TextBlock Text="Rank" Margin="0,20,0,0"/>
+                <CheckBox x:Name="RankAllCB" Content="All" Margin="20,0,0,0" IsChecked="True"
+                          Click="RankAllClick"/>
+                <CheckBox x:Name="Rank0CB" Content="Rank 0" Margin="20,0,0,0" IsChecked="True"
+                          Click="RankClick"/>
+                <CheckBox x:Name="Rank1CB" Content="Rank 1" Margin="20,0,0,0" IsChecked="True"
+                          Click="RankClick"/>
+                <CheckBox x:Name="Rank2CB" Content="Rank 2" Margin="20,0,0,0" IsChecked="True"
+                          Click="RankClick"/>
+                <CheckBox x:Name="Rank3CB" Content="Rank 3" Margin="20,0,0,0" IsChecked="True"
+                          Click="RankClick"/>
+                <CheckBox x:Name="Rank4CB" Content="Rank 4" Margin="20,0,0,0" IsChecked="True"
+                          Click="RankClick"/>
+                <CheckBox x:Name="Rank5CB" Content="Rank 5" Margin="20,0,0,0" IsChecked="True"
+                          Click="RankClick"/>
+
+                <TextBlock Text="Production Company" Margin="0,20,0,0"/>
+                <AutoSuggestBox x:Name="CompanyTB"
+                                Width="200"
+                                LostFocus="TrimTextSuggest" TextChanged="CompanyTextChanged"/>
+
+                <StackPanel Orientation="Horizontal" Margin="0,50,0,0" HorizontalAlignment="Right">
+                    <Button Content="Clear" Click="ClearFilter"/>
+                    <Button Content="Filter" 
+                            Click="FilterAnime" Margin="20,0,0,0"/>
+
+                </StackPanel>
+
+            </StackPanel>
+        </SplitView.Pane>
+
+        <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled">
+            <GridView x:Name="AnimeGrid"
+                      VerticalContentAlignment="Top" Padding="0,50"
+                      ScrollViewer.VerticalScrollBarVisibility="Hidden" 
+                      IsItemClickEnabled="True" ItemClick="AnimeItemClick"
+                      SelectionMode="None"
+                      ItemTemplate="{StaticResource AnimeGridItem}"/>
+            <CommandBar Background="{x:Null}" Margin="15,0,0,0">
+                <CommandBar.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <AppBarButton Icon="Filter" Click="ChangeFilterSplitView"/>
+                        <AutoSuggestBox x:Name="AnimeSearchBox" QueryIcon="Find"
+                                        PlaceholderText="Search for Anime" FontSize="18"
+                                        Width="300" VerticalAlignment="Center"
+                                        TextChanged="SearchTextChanged" QuerySubmitted="SearchQuerySubmitted"/>
+                    </StackPanel>
+                </CommandBar.Content>
+
+                <CommandBar.SecondaryCommands>
+                    <AppBarButton Label="Scroll To" Click="ScrollTo"/>
+                    <AppBarButton Label="Export" Click="ExportAnime"/>
+                    <AppBarButton Label="Import" Click="ImportAnime"/>
+                </CommandBar.SecondaryCommands>
+
+                <AppBarButton Icon="Add" Label="" Click="AddAnimeAsync"/>
+                <AppBarButton Icon="Up" Label="" Click="ScrollToTop"/>
+                <AppBarButton Icon="Save" Label="" Click="SaveAnime"/>
+            </CommandBar>
+        </Grid>
+    </SplitView>
+
+
+
 </Page>

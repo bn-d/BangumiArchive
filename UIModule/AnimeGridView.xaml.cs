@@ -4,7 +4,8 @@ using System.Linq;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using System.Collections.ObjectModel;
-
+using Windows.UI.Popups;
+using Windows.UI.Xaml.Navigation;
 
 namespace AnimeArchive.UIModule
 {
@@ -13,7 +14,8 @@ namespace AnimeArchive.UIModule
     /// </summary>
     public sealed partial class AnimeGridView : Page
     {
-        private ObservableCollection<Anime> Animes => Global.Animes;
+        private ObservableCollection<Anime> _filteredAnime;
+        private bool _isFiltered;
 
         public AnimeGridView()
         {
@@ -21,11 +23,24 @@ namespace AnimeArchive.UIModule
         }
 
         /// <summary>
+        /// Refresh binding
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            AnimeGrid.ItemsSource = null;
+            if (!_isFiltered)
+                AnimeGrid.ItemsSource = Global.Animes;
+            else
+                AnimeGrid.ItemsSource = _filteredAnime;
+        }
+
+        /// <summary>
         /// Display detailed anime info in another frame
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void AnimeListView_ItemClick(object sender, ItemClickEventArgs e)
+        private void AnimeItemClick(object sender, ItemClickEventArgs e)
         {
             ShowAnimeDetail((Anime) e.ClickedItem);
         }
@@ -52,27 +67,17 @@ namespace AnimeArchive.UIModule
 
             if (result != ContentDialogResult.Primary) return;
 
-            int indx = Animes.Count();
+            int indx = Global.Animes.Count();
 
             // Create new anime
             string name = (string) dialog.Text;
-            Animes.Add(new Anime(indx + 1, name));
+            Global.Animes.Add(new Anime(indx + 1, name));
 
             // Scroll to the new anime
-            AnimeGrid.ScrollIntoView(Animes[indx]);
+            AnimeGrid.ScrollIntoView(Global.Animes[indx]);
 
             // Display the anime details
-            ShowAnimeDetail(Animes[indx]);
-        }
-
-        /// <summary>
-        /// Save the entire anime list
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void SaveAnime(object sender, RoutedEventArgs e)
-        {
-            AnimeManager.WriteAnime();
+            ShowAnimeDetail(Global.Animes[indx]);
         }
 
         /// <summary>
@@ -82,28 +87,8 @@ namespace AnimeArchive.UIModule
         /// <param name="e"></param>
         private void ScrollToTop(object sender, RoutedEventArgs e)
         {
-            if (Animes.Any())
-                AnimeGrid.ScrollIntoView(Animes[0]);
-        }
-
-        /// <summary>
-        /// Export anime to user selected location
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ExportAnime(object sender, RoutedEventArgs e)
-        {
-            AnimeManager.ExportAnime();
-        }
-
-        /// <summary>
-        /// Import anime from user selected file
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ImportAnime(object sender, RoutedEventArgs e)
-        {
-            AnimeManager.ImportAnime();
+            if (Global.Animes.Any())
+                AnimeGrid.ScrollIntoView(Global.Animes[0]);
         }
 
         /// <summary>
@@ -117,7 +102,7 @@ namespace AnimeArchive.UIModule
             {
                 var suggestions = new List<Anime>();
 
-                foreach (Anime a in Animes)
+                foreach (Anime a in Global.Animes)
                 {
                     if (a.Title.IndexOf(sender.Text, StringComparison.CurrentCultureIgnoreCase) >= 0
                         || a.SubTitle.IndexOf(sender.Text, StringComparison.CurrentCultureIgnoreCase) >= 0)
@@ -164,9 +149,167 @@ namespace AnimeArchive.UIModule
 
             if (result == ContentDialogResult.Primary)
             {
-                int indx = Math.Max(Math.Min(int.Parse(dialog.Text), Animes.Count() - 1), 0);
-                AnimeGrid.ScrollIntoView(Animes[indx]);
+                int indx = Math.Max(Math.Min(int.Parse(dialog.Text), Global.Animes.Count() - 1), 0);
+                AnimeGrid.ScrollIntoView(Global.Animes[indx]);
             }
         }
+
+        /// <summary>
+        /// Open/Colse the filter split view
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ChangeFilterSplitView(object sender, RoutedEventArgs e)
+        {
+            FilterSplitView.IsPaneOpen = !FilterSplitView.IsPaneOpen;
+        }
+
+        /// <summary>
+        /// Filter the anime according to the user's specification
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void FilterAnime(object sender, RoutedEventArgs e)
+        {
+            _filteredAnime = new ObservableCollection<Anime>();
+
+            foreach (Anime a in Global.Animes)
+            {
+                if (FilterAnimeHelper(a))
+                    _filteredAnime.Add(a);
+            }
+            _isFiltered = true;
+            AnimeGrid.ItemsSource = _filteredAnime;
+        }
+
+        private bool FilterAnimeHelper(Anime a)
+        {
+            if (UIDictionary.NullBToBool(WatchingCB.IsChecked) && 
+                !UIDictionary.NullBToBool(a.IsWatching))
+                return false;
+
+            bool neverWatch = false;
+            if (!UIDictionary.NullBToBool(NWatchedCB.IsChecked))
+                neverWatch = true;
+            else
+            {
+                foreach (Season s in a.Seasons)
+                {
+                    if (s.Time == 0)
+                    {
+                        neverWatch = true;
+                        break;
+                    }
+                }
+            }
+            if (!neverWatch)
+                return false;
+
+            if (!((a.Rank == 0 && UIDictionary.NullBToBool(Rank0CB.IsChecked)) ||
+                  (a.Rank == 1 && UIDictionary.NullBToBool(Rank1CB.IsChecked)) ||
+                  (a.Rank == 2 && UIDictionary.NullBToBool(Rank2CB.IsChecked)) ||
+                  (a.Rank == 3 && UIDictionary.NullBToBool(Rank3CB.IsChecked)) ||
+                  (a.Rank == 4 && UIDictionary.NullBToBool(Rank4CB.IsChecked)) ||
+                  (a.Rank == 5 && UIDictionary.NullBToBool(Rank5CB.IsChecked))))
+                return false;
+
+            bool company = false;
+            if (CompanyTB.Text == "")
+                company = true;
+            else
+            {
+                foreach (Season s in a.Seasons)
+                {
+                    if (s.Company == CompanyTB.Text)
+                    {
+                        company = true;
+                        break;
+                    }
+                }
+            }
+            if (!company)
+                return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Actions when rank all checkbox is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RankAllClick(object sender, RoutedEventArgs e)
+        {
+            CheckBox cb = (CheckBox)sender;
+            if (UIDictionary.NullBToBool(cb.IsChecked))
+            {
+                Rank0CB.IsChecked = true;
+                Rank1CB.IsChecked = true;
+                Rank2CB.IsChecked = true;
+                Rank3CB.IsChecked = true;
+                Rank4CB.IsChecked = true;
+                Rank5CB.IsChecked = true;
+            }
+            else
+            {
+                Rank0CB.IsChecked = false;
+                Rank1CB.IsChecked = false;
+                Rank2CB.IsChecked = false;
+                Rank3CB.IsChecked = false;
+                Rank4CB.IsChecked = false;
+                Rank5CB.IsChecked = false;
+            }
+        }
+
+        /// <summary>
+        /// Actions when rank checkbox is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RankClick(object sender, RoutedEventArgs e)
+        {
+            CheckBox cb = (CheckBox) sender;
+            if (!UIDictionary.NullBToBool(cb.IsChecked))
+                RankAllCB.IsChecked = false;
+            else
+            {
+                if (UIDictionary.NullBToBool(Rank0CB.IsChecked) &&
+                    UIDictionary.NullBToBool(Rank1CB.IsChecked) &&
+                    UIDictionary.NullBToBool(Rank2CB.IsChecked) &&
+                    UIDictionary.NullBToBool(Rank3CB.IsChecked) &&
+                    UIDictionary.NullBToBool(Rank4CB.IsChecked) &&
+                    UIDictionary.NullBToBool(Rank5CB.IsChecked))
+                    RankAllCB.IsChecked = true;
+            }
+        }
+
+        /// <summary>
+        /// Clear the filter
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ClearFilter(object sender, RoutedEventArgs e)
+        {
+            if (_isFiltered)
+            {
+                AnimeGrid.ItemsSource = Global.Animes;
+                _isFiltered = false;
+            }
+        }
+
+        private void TrimTextSuggest(object sender, RoutedEventArgs e) =>
+            UIDictionary.TrimTextSuggestHelper(sender, e);
+
+        private void SaveAnime(object sender, RoutedEventArgs e) =>
+            AnimeManager.WriteAnime();
+
+        private void ExportAnime(object sender, RoutedEventArgs e) =>
+            AnimeManager.ExportAnime();
+
+        private void ImportAnime(object sender, RoutedEventArgs e) =>
+            AnimeManager.ImportAnime();
+
+        private void CompanyTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args) =>
+            UIDictionary.CompanyTextChangedHelper(sender, args);
     }
 }

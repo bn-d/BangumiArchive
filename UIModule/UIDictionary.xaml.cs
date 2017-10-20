@@ -2,9 +2,14 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Windows.System;
+using Windows.UI.Text.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using ListView = Windows.UI.Xaml.Controls.ListView;
+using TextBox = Windows.UI.Xaml.Controls.TextBox;
 
 namespace AnimeArchive.UIModule
 {
@@ -20,9 +25,12 @@ namespace AnimeArchive.UIModule
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void TrimText(object sender, RoutedEventArgs e)
+        private void TrimText(object sender, RoutedEventArgs e) =>
+            TrimTextHelper(sender, e);
+
+        public static void TrimTextHelper(object sender, RoutedEventArgs e)
         {
-            TextBox TB = (TextBox) sender;
+            TextBox TB = (TextBox)sender;
             TB.Text = TB.Text.Trim();
         }
 
@@ -31,10 +39,27 @@ namespace AnimeArchive.UIModule
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void TrimTextSuggest(object sender, RoutedEventArgs e)
+        private void TrimTextSuggest(object sender, RoutedEventArgs e) =>
+            TrimTextSuggestHelper(sender, e);
+
+        public static void TrimTextSuggestHelper(object sender, RoutedEventArgs e)
         {
             AutoSuggestBox TB = (AutoSuggestBox)sender;
             TB.Text = TB.Text.Trim();
+        }
+
+        /// <summary>
+        /// Allow only digit
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnlyDigitKeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            if ((e.Key < VirtualKey.NumberPad0 || e.Key > VirtualKey.NumberPad9) & 
+                (e.Key < VirtualKey.Number0 || e.Key > VirtualKey.Number9))
+            {
+                e.Handled = true;
+            }
         }
 
         /// <summary>
@@ -42,10 +67,13 @@ namespace AnimeArchive.UIModule
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
-        private void CompanyTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        private void CompanyTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args) => 
+            CompanyTextChangedHelper(sender, args);
+
+        public static void CompanyTextChangedHelper(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             // Find suggestions for search
-            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput && sender.Text.Count() > 1)
+            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput && sender.Text.Any())
             {
                 var suggestions = new List<string>();
 
@@ -88,6 +116,16 @@ namespace AnimeArchive.UIModule
             ObservableCollection<Song> songs = (ObservableCollection<Song>)songList.ItemsSource;
             if (songs.Any())
                 songs.RemoveAt(songs.Count() - 1);
+        }
+
+        /// <summary>
+        /// Convert bool? to bool
+        /// </summary>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static bool NullBToBool(bool? b)
+        {
+            return b != null && (bool)b;
         }
     }
 }
