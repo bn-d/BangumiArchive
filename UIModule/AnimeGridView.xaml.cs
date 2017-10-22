@@ -19,7 +19,7 @@ namespace AnimeArchive.UIModule
 
         public AnimeGridView()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace AnimeArchive.UIModule
 
             if (result != ContentDialogResult.Primary) return;
 
-            int indx = Global.Animes.Count();
+            int indx = Global.Animes.Count;
 
             // Create new anime
             string name = (string) dialog.Text;
@@ -149,7 +149,7 @@ namespace AnimeArchive.UIModule
 
             if (result == ContentDialogResult.Primary)
             {
-                int indx = Math.Max(Math.Min(int.Parse(dialog.Text), Global.Animes.Count() - 1), 0);
+                int indx = Math.Max(Math.Min(int.Parse(dialog.Text), Global.Animes.Count - 1), 0);
                 AnimeGrid.ScrollIntoView(Global.Animes[indx]);
             }
         }
@@ -205,12 +205,12 @@ namespace AnimeArchive.UIModule
             if (!neverWatch)
                 return false;
 
-            if (!((a.Rank == 0 && UIDictionary.NullBToBool(Rank0CB.IsChecked)) ||
-                  (a.Rank == 1 && UIDictionary.NullBToBool(Rank1CB.IsChecked)) ||
-                  (a.Rank == 2 && UIDictionary.NullBToBool(Rank2CB.IsChecked)) ||
-                  (a.Rank == 3 && UIDictionary.NullBToBool(Rank3CB.IsChecked)) ||
-                  (a.Rank == 4 && UIDictionary.NullBToBool(Rank4CB.IsChecked)) ||
-                  (a.Rank == 5 && UIDictionary.NullBToBool(Rank5CB.IsChecked))))
+            if (!((a.Rank == 0 && UIDictionary.NullBToBool(Rank5CB.IsChecked)) ||
+                  (a.Rank == 1 && UIDictionary.NullBToBool(Rank4CB.IsChecked)) ||
+                  (a.Rank == 2 && UIDictionary.NullBToBool(Rank3CB.IsChecked)) ||
+                  (a.Rank == 3 && UIDictionary.NullBToBool(Rank2CB.IsChecked)) ||
+                  (a.Rank == 4 && UIDictionary.NullBToBool(Rank1CB.IsChecked)) ||
+                  (a.Rank == 5 && UIDictionary.NullBToBool(NoRankCB.IsChecked))))
                 return false;
 
             bool company = false;
@@ -243,21 +243,22 @@ namespace AnimeArchive.UIModule
             CheckBox cb = (CheckBox)sender;
             if (UIDictionary.NullBToBool(cb.IsChecked))
             {
-                Rank0CB.IsChecked = true;
+                Rank5CB.IsChecked = true;
                 Rank1CB.IsChecked = true;
                 Rank2CB.IsChecked = true;
                 Rank3CB.IsChecked = true;
                 Rank4CB.IsChecked = true;
                 Rank5CB.IsChecked = true;
+                NoRankCB.IsChecked = true;
             }
             else
             {
-                Rank0CB.IsChecked = false;
                 Rank1CB.IsChecked = false;
                 Rank2CB.IsChecked = false;
                 Rank3CB.IsChecked = false;
                 Rank4CB.IsChecked = false;
                 Rank5CB.IsChecked = false;
+                NoRankCB.IsChecked = false;
             }
         }
 
@@ -273,12 +274,12 @@ namespace AnimeArchive.UIModule
                 RankAllCB.IsChecked = false;
             else
             {
-                if (UIDictionary.NullBToBool(Rank0CB.IsChecked) &&
-                    UIDictionary.NullBToBool(Rank1CB.IsChecked) &&
+                if (UIDictionary.NullBToBool(Rank1CB.IsChecked) &&
                     UIDictionary.NullBToBool(Rank2CB.IsChecked) &&
                     UIDictionary.NullBToBool(Rank3CB.IsChecked) &&
                     UIDictionary.NullBToBool(Rank4CB.IsChecked) &&
-                    UIDictionary.NullBToBool(Rank5CB.IsChecked))
+                    UIDictionary.NullBToBool(Rank5CB.IsChecked) &&
+                    UIDictionary.NullBToBool(NoRankCB.IsChecked))
                     RankAllCB.IsChecked = true;
             }
         }
@@ -300,14 +301,14 @@ namespace AnimeArchive.UIModule
         private void TrimTextSuggest(object sender, RoutedEventArgs e) =>
             UIDictionary.TrimTextSuggestHelper(sender, e);
 
-        private void SaveAnime(object sender, RoutedEventArgs e) =>
-            AnimeManager.WriteAnime();
+        private void SaveData(object sender, RoutedEventArgs e) =>
+            DataManager.SaveData();
 
         private void ExportAnime(object sender, RoutedEventArgs e) =>
-            AnimeManager.ExportAnime();
+            DataManager.ExportAnime();
 
         private void ImportAnime(object sender, RoutedEventArgs e) =>
-            AnimeManager.ImportAnime();
+            DataManager.ImportAnime();
 
         private void CompanyTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args) =>
             UIDictionary.CompanyTextChangedHelper(sender, args);

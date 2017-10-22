@@ -9,17 +9,15 @@ namespace AnimeArchive
         {
             // TODO List
             // Statistic Page
-            //     Layout
-            //     Refresh function etc
-            // Other page
-            // Anime filter
-            // CVs
+            //     Item Click
 
             this.InitializeComponent();
             // Iniitialize all the data
-            AnimeManager.InitializeData();
+            DataManager.InitializeData();
             // Navigate to AnimeGridView
             MainPageFrame.Navigate(typeof(AnimeGridView));
+            StatisticsFrame.Navigate(typeof(StatisticsView));
+            OtherFrame.Navigate(typeof(OtherView));
         }
     }
 }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Windows.System;
-using Windows.UI.Text.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -104,7 +103,7 @@ namespace AnimeArchive.UIModule
         }
 
         /// <summary>
-        /// Remove the last song, if the season list is not empty
+        /// Remove the last song, if the list is not empty
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -115,7 +114,36 @@ namespace AnimeArchive.UIModule
             ListView songList = (ListView)VisualTreeHelper.GetChild(parent, 0);
             ObservableCollection<Song> songs = (ObservableCollection<Song>)songList.ItemsSource;
             if (songs.Any())
-                songs.RemoveAt(songs.Count() - 1);
+                songs.RemoveAt(songs.Count - 1);
+        }
+
+        /// <summary>
+        /// Add a new item
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddListItem(object sender, RoutedEventArgs e)
+        {
+            StackPanel parent = (StackPanel)VisualTreeHelper.GetParent(
+                VisualTreeHelper.GetParent((AppBarButton)sender));
+            GridView nameList = (GridView)VisualTreeHelper.GetChild(parent, 1);
+            ObservableCollection<StringWrap> names = (ObservableCollection<StringWrap>)nameList.ItemsSource;
+            names.Add(new StringWrap(names.Count + 1));
+        }
+
+        /// <summary>
+        /// Remove the last item, if the list is not empty
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RemoveListItem(object sender, RoutedEventArgs e)
+        {
+            StackPanel parent = (StackPanel)VisualTreeHelper.GetParent(
+                VisualTreeHelper.GetParent((AppBarButton)sender));
+            GridView nameList = (GridView)VisualTreeHelper.GetChild(parent, 1);
+            ObservableCollection<StringWrap> names = (ObservableCollection<StringWrap>)nameList.ItemsSource;
+            if (names.Any())
+                names.RemoveAt(names.Count - 1);
         }
 
         /// <summary>

@@ -23,17 +23,17 @@
                 <TextBlock Text="Rank" Margin="0,20,0,0"/>
                 <CheckBox x:Name="RankAllCB" Content="All" Margin="20,0,0,0" IsChecked="True"
                           Click="RankAllClick"/>
-                <CheckBox x:Name="Rank0CB" Content="Rank 0" Margin="20,0,0,0" IsChecked="True"
-                          Click="RankClick"/>
-                <CheckBox x:Name="Rank1CB" Content="Rank 1" Margin="20,0,0,0" IsChecked="True"
-                          Click="RankClick"/>
-                <CheckBox x:Name="Rank2CB" Content="Rank 2" Margin="20,0,0,0" IsChecked="True"
-                          Click="RankClick"/>
-                <CheckBox x:Name="Rank3CB" Content="Rank 3" Margin="20,0,0,0" IsChecked="True"
+                <CheckBox x:Name="Rank5CB" Content="Rank 5" Margin="20,0,0,0" IsChecked="True"
                           Click="RankClick"/>
                 <CheckBox x:Name="Rank4CB" Content="Rank 4" Margin="20,0,0,0" IsChecked="True"
                           Click="RankClick"/>
-                <CheckBox x:Name="Rank5CB" Content="Rank 5" Margin="20,0,0,0" IsChecked="True"
+                <CheckBox x:Name="Rank3CB" Content="Rank 3" Margin="20,0,0,0" IsChecked="True"
+                          Click="RankClick"/>
+                <CheckBox x:Name="Rank2CB" Content="Rank 2" Margin="20,0,0,0" IsChecked="True"
+                          Click="RankClick"/>
+                <CheckBox x:Name="Rank1CB" Content="Rank 1" Margin="20,0,0,0" IsChecked="True"
+                          Click="RankClick"/>
+                <CheckBox x:Name="NoRankCB" Content="No Rank" Margin="20,0,0,0" IsChecked="True"
                           Click="RankClick"/>
 
                 <TextBlock Text="Production Company" Margin="0,20,0,0"/>
@@ -44,21 +44,20 @@
                 <StackPanel Orientation="Horizontal" Margin="0,50,0,0" HorizontalAlignment="Right">
                     <Button Content="Clear" Click="ClearFilter"/>
                     <Button Content="Filter" 
-                            Click="FilterAnime" Margin="20,0,0,0"/>
-
+                            Click="FilterAnime" Margin="10,0,0,0"/>
                 </StackPanel>
-
             </StackPanel>
         </SplitView.Pane>
 
         <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled">
-            <GridView x:Name="AnimeGrid"
-                      VerticalContentAlignment="Top" Padding="0,50"
-                      ScrollViewer.VerticalScrollBarVisibility="Hidden" 
-                      IsItemClickEnabled="True" ItemClick="AnimeItemClick"
-                      SelectionMode="None"
-                      ItemTemplate="{StaticResource AnimeGridItem}"/>
-            <CommandBar Background="{x:Null}" Margin="15,0,0,0">
+            <ScrollViewer>
+                <GridView x:Name="AnimeGrid"
+                          VerticalContentAlignment="Top" HorizontalAlignment="Center" Padding="0,50"
+                          IsItemClickEnabled="True" ItemClick="AnimeItemClick"
+                          SelectionMode="None"
+                          ItemTemplate="{StaticResource AnimeGridItem}"/>
+            </ScrollViewer>
+            <CommandBar Background="{x:Null}">
                 <CommandBar.Content>
                     <StackPanel Orientation="Horizontal">
                         <AppBarButton Icon="Filter" Click="ChangeFilterSplitView"/>
@@ -77,7 +76,7 @@
 
                 <AppBarButton Icon="Add" Label="" Click="AddAnimeAsync"/>
                 <AppBarButton Icon="Up" Label="" Click="ScrollToTop"/>
-                <AppBarButton Icon="Save" Label="" Click="SaveAnime"/>
+                <AppBarButton Icon="Save" Label="" Click="SaveData"/>
             </CommandBar>
         </Grid>
     </SplitView>

@@ -8,8 +8,8 @@
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Pivot>
-            <PivotItem Header="Main Page">
-                <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled">
+            <PivotItem Header="Anime List">
+                <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled" Background="Black">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition/>
@@ -28,14 +28,35 @@
                             <ImageBrush Stretch="UniformToFill" ImageSource="Assets/background.png"/>
                         </Frame.Background>
                     </Frame>
-                    
+                </Grid>
+            </PivotItem>
+
+            <PivotItem Header="Other">
+                <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled" Background="Black">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid Margin="0" Padding="0" Height="15" Grid.Row="0">
+                        <Grid.Background>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="Black" Offset="1"/>
+                                <GradientStop Color="White"/>
+                            </LinearGradientBrush>
+                        </Grid.Background>
+                    </Grid>
+
+                    <Frame x:Name="OtherFrame" Grid.Row="1">
+                        <Frame.Background>
+                            <ImageBrush Stretch="UniformToFill" ImageSource="Assets/background.png"/>
+                        </Frame.Background>
+                    </Frame>
                 </Grid>
             </PivotItem>
 
             <PivotItem Header="Statistics">
-                <Frame x:Name="StatFrame"/>
+                <Frame x:Name="StatisticsFrame"/>
             </PivotItem>
-            
         </Pivot>
     </Grid>
 </Page>

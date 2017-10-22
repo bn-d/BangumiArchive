@@ -186,7 +186,7 @@ namespace AnimeArchive
             ObservableCollection<Song> s = (ObservableCollection<Song>)value;
             if (s == null || !s.Any())
                 return "Anime Song";
-            else if (s.Count() == 1)
+            else if (s.Count == 1)
                 return "1 Song";
             else return string.Concat(s.Count.ToString(), " Songs");
         }

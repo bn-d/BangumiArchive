@@ -7,6 +7,7 @@ using System.Text;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.UI.Popups;
+using AnimeArchive.UIModule;
 
 namespace AnimeArchive
 {
@@ -18,6 +19,8 @@ namespace AnimeArchive
         public static ObservableCollection<Anime> Animes;
         public static HashSet<string> CompanyHashSet;
 
+        public static ObservableCollection<OtherList> OtherLists;
+
         public static ApplicationDataContainer LocalSettings = 
             ApplicationData.Current.LocalSettings;
         public static StorageFolder LocalFolder =
@@ -27,9 +30,10 @@ namespace AnimeArchive
     /// <summary>
     /// A class for read and write anime data
     /// </summary>
-    internal class AnimeManager
+    internal class DataManager
     {
         private static string _animeDataName = "animes.dat";
+        private static string _otherDataName = "other.dat";
 
         /// <summary>
         /// Initialize all the required data
@@ -37,11 +41,22 @@ namespace AnimeArchive
         public static void InitializeData()
         {
             ReadAnime();
+            ReadOtherList();
             SetCompanyList();
         }
 
         /// <summary>
-        /// Write the given anime list to local storage
+        /// Save all data to file
+        /// </summary>
+        public static void SaveData()
+        {
+            WriteAnime();
+            WriteOtherList();
+            SetCompanyList();
+        }
+
+        /// <summary>
+        /// Write anime list to local storage
         /// </summary>
         public static async void WriteAnime()
         {
@@ -51,8 +66,6 @@ namespace AnimeArchive
                 DataContractSerializer serializer = new DataContractSerializer(typeof(ObservableCollection<Anime>));
                 serializer.WriteObject(memoryStream, Global.Animes);
                 memoryStream.Position = 0;
-
-                //Global.localSettings.Values["animeData"] = reader.ReadToEnd();
 
                 StorageFile file = await Global.LocalFolder.CreateFileAsync(_animeDataName,
                     CreationCollisionOption.ReplaceExisting);
@@ -82,6 +95,49 @@ namespace AnimeArchive
             catch (Exception)
             {
                 Global.Animes = new ObservableCollection<Anime>();
+            }
+        }
+
+        /// <summary>
+        /// Write other list to local storage
+        /// </summary>
+        public static async void WriteOtherList()
+        {
+            using (MemoryStream memoryStream = new MemoryStream())
+            using (StreamReader reader = new StreamReader(memoryStream))
+            {
+                DataContractSerializer serializer = new DataContractSerializer(typeof(ObservableCollection<OtherList>));
+                serializer.WriteObject(memoryStream, Global.OtherLists);
+                memoryStream.Position = 0;
+
+                StorageFile file = await Global.LocalFolder.CreateFileAsync(_otherDataName,
+                    CreationCollisionOption.ReplaceExisting);
+                await FileIO.WriteTextAsync(file, reader.ReadToEnd());
+            }
+        }
+
+        /// <summary>
+        /// Read other list from local storage
+        /// </summary>
+        public static async void ReadOtherList()
+        {
+            try
+            {
+                StorageFile file = await Global.LocalFolder.GetFileAsync(_otherDataName);
+                string xml = await FileIO.ReadTextAsync(file);
+
+                using (Stream stream = new MemoryStream())
+                {
+                    byte[] data = Encoding.UTF8.GetBytes(xml);
+                    stream.Write(data, 0, data.Length);
+                    stream.Position = 0;
+                    DataContractSerializer deserializer = new DataContractSerializer(typeof(ObservableCollection<OtherList>));
+                    Global.OtherLists = (ObservableCollection<OtherList>)deserializer.ReadObject(stream);
+                }
+            }
+            catch (Exception)
+            {
+                Global.OtherLists = new ObservableCollection<OtherList>();
             }
         }
 
@@ -144,7 +200,77 @@ namespace AnimeArchive
                     DataContractSerializer deserializer = new DataContractSerializer(typeof(ObservableCollection<Anime>));
                     Global.Animes = (ObservableCollection<Anime>)deserializer.ReadObject(stream);
 
-                    var dialog = new MessageDialog("", "Import Successful");
+                    var dialog = new MessageDialog("", string.Format("Import {0} anime Successful", Global.Animes.Count));
+                    await dialog.ShowAsync();
+                }
+            }
+            catch (Exception)
+            {
+                var dialog = new MessageDialog("", "Import Failed");
+                await dialog.ShowAsync();
+            }
+        }
+
+        /// <summary>
+        /// Export other list to user selected location
+        /// </summary>
+        public static async void ExportOtherList()
+        {
+            FileSavePicker savePicker = new FileSavePicker
+            {
+                SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
+                SuggestedFileName = _otherDataName,
+                FileTypeChoices = { { "Data", new List<string>() { ".dat" } } }
+            };
+
+            var file = await savePicker.PickSaveFileAsync();
+
+            if (file == null) return;
+
+            using (MemoryStream memoryStream = new MemoryStream())
+            using (StreamReader reader = new StreamReader(memoryStream))
+            {
+                DataContractSerializer serializer = new DataContractSerializer(typeof(ObservableCollection<OtherList>));
+                serializer.WriteObject(memoryStream, Global.OtherLists);
+                memoryStream.Position = 0;
+
+                await FileIO.WriteTextAsync(file, reader.ReadToEnd());
+
+                var dialog = new MessageDialog("", "Export Successful");
+                await dialog.ShowAsync();
+            }
+        }
+
+        /// <summary>
+        /// Import other list from user selected file
+        /// </summary>
+        public static async void ImportOtherList()
+        {
+            // Load the flag of the anime through file picker
+            FileOpenPicker openPicker = new FileOpenPicker
+            {
+                ViewMode = PickerViewMode.Thumbnail,
+                SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
+                FileTypeFilter = { ".dat" }
+            };
+
+            try
+            {
+                StorageFile file = await openPicker.PickSingleFileAsync();
+
+                if (file == null) return;
+
+                string xml = await FileIO.ReadTextAsync(file);
+
+                using (Stream stream = new MemoryStream())
+                {
+                    byte[] data = Encoding.UTF8.GetBytes(xml);
+                    stream.Write(data, 0, data.Length);
+                    stream.Position = 0;
+                    DataContractSerializer deserializer = new DataContractSerializer(typeof(ObservableCollection<OtherList>));
+                    Global.OtherLists = (ObservableCollection<OtherList>)deserializer.ReadObject(stream);
+
+                    var dialog = new MessageDialog("", string.Format("Import {0} list Successful", Global.OtherLists.Count));
                     await dialog.ShowAsync();
                 }
             }

@@ -20,8 +20,8 @@ namespace AnimeArchive.UIModule
 
         public AnimeInfoView()
         {
-            this.InitializeComponent();
-            this.DataContextChanged += (s, e) => this.Bindings.Update();
+            InitializeComponent();
+            DataContextChanged += (s, e) => Bindings.Update();
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace AnimeArchive.UIModule
         private void RemoveSeason(object sender, RoutedEventArgs e)
         {
             if (_curAnime.Seasons.Any())
-                _curAnime.Seasons.RemoveAt(_curAnime.Seasons.Count() - 1);
+                _curAnime.Seasons.RemoveAt(_curAnime.Seasons.Count - 1);
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace AnimeArchive.UIModule
         /// <param name="e"></param>
         private void ChangeRank(object sender, RoutedEventArgs e)
         {
-            _curAnime.Rank = int.Parse(((MenuFlyoutItem)sender).Text);
+            _curAnime.Rank = 5 - int.Parse(((MenuFlyoutItem)sender).Text);
             RankBar.Fill = Anime.GetRankColorBrush(_curAnime.Rank);
         }
 
@@ -123,18 +123,18 @@ namespace AnimeArchive.UIModule
         /// <param name="e"></param>
         private void NextAnime(object sender, RoutedEventArgs e)
         {
-            if (_curAnime.Index < Global.Animes.Count())
+            if (_curAnime.Index < Global.Animes.Count)
                 Frame.Navigate(typeof(AnimeInfoView), _curAnime.Index);
         }
 
         private void SaveAnime(object sender, RoutedEventArgs e) =>
-            AnimeManager.WriteAnime();
+            DataManager.SaveData();
 
         private void ExportAnime(object sender, RoutedEventArgs e) =>
-            AnimeManager.ExportAnime();
+            DataManager.ExportAnime();
 
         private void ImportAnime(object sender, RoutedEventArgs e) =>
-            AnimeManager.ImportAnime();
+            DataManager.ImportAnime();
 
         private void TrimText(object sender, RoutedEventArgs e) =>
             UIDictionary.TrimTextHelper(sender, e);

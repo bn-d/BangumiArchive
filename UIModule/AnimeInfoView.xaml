@@ -14,7 +14,7 @@
     </Page.Transitions>
 
     <Grid>
-        <ScrollViewer Background="{x:Null}" BorderBrush="{x:Null}" VerticalScrollBarVisibility="Hidden">
+        <ScrollViewer Background="{x:Null}" BorderBrush="{x:Null}">
             <StackPanel x:Name="AnimeInfoList" Margin="0,50,0,0" >
                 <StackPanel Orientation="Horizontal" 
                         HorizontalAlignment="Center" Margin="0,0,0,20">
@@ -29,12 +29,12 @@
                         MinWidth="50" Background="{x:Null}" BorderBrush="{x:Null}">
                         <Button.Flyout>
                             <MenuFlyout Placement="Bottom">
-                                <MenuFlyoutItem Text="0" Background="White" Foreground="White" Click="ChangeRank"/>
-                                <MenuFlyoutItem Text="1" Background="#FF5BEBE2" Foreground="#FF5BEBE2" Click="ChangeRank"/>
-                                <MenuFlyoutItem Text="2" Background="#FFE0E710" Foreground="#FFE0E710" Click="ChangeRank"/>
-                                <MenuFlyoutItem Text="3" Background="#FFBFBFBF" Foreground="#FFBFBFBF" Click="ChangeRank"/>
-                                <MenuFlyoutItem Text="4" Background="#FFF0853D" Foreground="#FFF0853D" Click="ChangeRank"/>
-                                <MenuFlyoutItem Text="5" Background="Black" Foreground="Black"/>
+                                <MenuFlyoutItem Text="5" Background="White" Foreground="White" Click="ChangeRank"/>
+                                <MenuFlyoutItem Text="4" Background="#FF5BEBE2" Foreground="#FF5BEBE2" Click="ChangeRank"/>
+                                <MenuFlyoutItem Text="3" Background="#FFE0E710" Foreground="#FFE0E710" Click="ChangeRank"/>
+                                <MenuFlyoutItem Text="2" Background="#FFBFBFBF" Foreground="#FFBFBFBF" Click="ChangeRank"/>
+                                <MenuFlyoutItem Text="1" Background="#FFF0853D" Foreground="#FFF0853D" Click="ChangeRank"/>
+                                <MenuFlyoutItem Text="0" Background="Black" Foreground="Black"/>
                             </MenuFlyout>
                         </Button.Flyout>
                     </Button>
