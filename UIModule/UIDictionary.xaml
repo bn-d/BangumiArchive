@@ -154,7 +154,9 @@
                      Style="{StaticResource TBStyle}"
                      HorizontalAlignment="Left" MinWidth="400"
                      FontSize="24" LostFocus="TrimText"/>
-            <GridView ItemsSource="{x:Bind NameList}" SelectionMode="None">
+            <GridView ItemsSource="{x:Bind NameList}" SelectionMode="None" 
+                      CanDragItems="True" CanReorderItems="True" AllowDrop="True"
+                      DragItemsCompleted="OtherListReorderCompleted">
                 <GridView.ItemTemplate>
                     <DataTemplate x:DataType="local:StringWrap">
                         <StackPanel Orientation="Horizontal">

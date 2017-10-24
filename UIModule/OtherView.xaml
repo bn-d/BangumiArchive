@@ -10,8 +10,10 @@
 
     <Grid>
         <ScrollViewer>
-            <ListView ItemsSource="{x:Bind OtherLists}" ItemTemplate="{StaticResource OtherListItem}" 
+            <ListView x:Name="OtherListView"
+                      ItemsSource="{x:Bind OtherLists}" ItemTemplate="{StaticResource OtherListItem}" 
                       VerticalContentAlignment="Top" HorizontalAlignment="Center"
+                      CanDragItems="True" CanReorderItems="True" AllowDrop="True" 
                       SelectionMode="None" Padding="50"/>
         </ScrollViewer>
         <CommandBar Background="{x:Null}">

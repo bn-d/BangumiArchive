@@ -7,13 +7,8 @@ namespace AnimeArchive
     {
         public MainPage()
         {
-            // TODO List
-            // Statistic Page
-            //     Item Click
+            InitializeComponent();
 
-            this.InitializeComponent();
-            // Iniitialize all the data
-            DataManager.InitializeData();
             // Navigate to AnimeGridView
             MainPageFrame.Navigate(typeof(AnimeGridView));
             StatisticsFrame.Navigate(typeof(StatisticsView));

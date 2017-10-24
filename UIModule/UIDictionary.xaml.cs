@@ -155,5 +155,21 @@ namespace AnimeArchive.UIModule
         {
             return b != null && (bool)b;
         }
+
+        /// <summary>
+        /// Reassign the index number after reorder
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        private void OtherListReorderCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
+        {
+            ObservableCollection<StringWrap> l = (ObservableCollection<StringWrap>) sender.ItemsSource;
+            for (int i = 0; i < l.Count(); i++)
+            {
+                l[i].Index = i + 1;
+            }
+            sender.ItemsSource = null;
+            sender.ItemsSource = l;
+        }
     }
 }

@@ -243,22 +243,13 @@ namespace AnimeArchive.UIModule
             CheckBox cb = (CheckBox)sender;
             if (UIDictionary.NullBToBool(cb.IsChecked))
             {
-                Rank5CB.IsChecked = true;
-                Rank1CB.IsChecked = true;
-                Rank2CB.IsChecked = true;
-                Rank3CB.IsChecked = true;
-                Rank4CB.IsChecked = true;
-                Rank5CB.IsChecked = true;
-                NoRankCB.IsChecked = true;
+                Rank5CB.IsChecked = Rank1CB.IsChecked = Rank2CB.IsChecked = Rank3CB.IsChecked =
+                    Rank4CB.IsChecked = Rank5CB.IsChecked = NoRankCB.IsChecked = true;
             }
             else
             {
-                Rank1CB.IsChecked = false;
-                Rank2CB.IsChecked = false;
-                Rank3CB.IsChecked = false;
-                Rank4CB.IsChecked = false;
-                Rank5CB.IsChecked = false;
-                NoRankCB.IsChecked = false;
+                Rank5CB.IsChecked = Rank1CB.IsChecked = Rank2CB.IsChecked = Rank3CB.IsChecked =
+                    Rank4CB.IsChecked = Rank5CB.IsChecked = NoRankCB.IsChecked = false;
             }
         }
 
@@ -291,6 +282,13 @@ namespace AnimeArchive.UIModule
         /// <param name="e"></param>
         private void ClearFilter(object sender, RoutedEventArgs e)
         {
+            WatchingCB.IsChecked = NWatchedCB.IsChecked = false;
+            RankAllCB.IsChecked = true;
+            Rank5CB.IsChecked = Rank1CB.IsChecked = Rank2CB.IsChecked = Rank3CB.IsChecked =
+                Rank4CB.IsChecked = Rank5CB.IsChecked = NoRankCB.IsChecked = true;
+
+            CompanyTB.Text = "";
+
             if (_isFiltered)
             {
                 AnimeGrid.ItemsSource = Global.Animes;
@@ -298,17 +296,29 @@ namespace AnimeArchive.UIModule
             }
         }
 
+        /// <summary>
+        /// Import from file, if successfully import, refresh anime grid
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void ImportAnime(object sender, RoutedEventArgs e)
+        {
+            bool imported = await DataManager.ImportAnime();
+            if (imported)
+            {
+                AnimeGrid.ItemsSource = null;
+                AnimeGrid.ItemsSource = Global.Animes;
+            }
+        }
+        
+        private void ExportAnime(object sender, RoutedEventArgs e) =>
+            DataManager.ExportAnime();
+
         private void TrimTextSuggest(object sender, RoutedEventArgs e) =>
             UIDictionary.TrimTextSuggestHelper(sender, e);
 
         private void SaveData(object sender, RoutedEventArgs e) =>
             DataManager.SaveData();
-
-        private void ExportAnime(object sender, RoutedEventArgs e) =>
-            DataManager.ExportAnime();
-
-        private void ImportAnime(object sender, RoutedEventArgs e) =>
-            DataManager.ImportAnime();
 
         private void CompanyTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args) =>
             UIDictionary.CompanyTextChangedHelper(sender, args);

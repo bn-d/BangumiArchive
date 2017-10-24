@@ -53,8 +53,15 @@ namespace AnimeArchive.UIModule
                 OtherLists.RemoveAt(OtherLists.Count - 1);
         }
 
-        private void ImportOtherList(object sender, RoutedEventArgs e) =>
-            DataManager.ImportOtherList();
+        private async void ImportOtherList(object sender, RoutedEventArgs e)
+        {
+            bool imported = await DataManager.ImportOtherList();
+            if (imported)
+            {
+                OtherListView.ItemsSource = null;
+                OtherListView.ItemsSource = Global.OtherLists;
+            }
+        }
 
         private void ExportOtherList(object sender, RoutedEventArgs e) =>
             DataManager.ExportOtherList();

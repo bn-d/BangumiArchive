@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.UI.Popups;
@@ -16,10 +17,12 @@ namespace AnimeArchive
     /// </summary>
     internal class Global
     {
-        public static ObservableCollection<Anime> Animes;
+        public static ObservableCollection<Anime> Animes = 
+            new ObservableCollection<Anime>();
         public static HashSet<string> CompanyHashSet;
 
-        public static ObservableCollection<OtherList> OtherLists;
+        public static ObservableCollection<OtherList> OtherLists = 
+            new ObservableCollection<OtherList>();
 
         public static ApplicationDataContainer LocalSettings = 
             ApplicationData.Current.LocalSettings;
@@ -38,10 +41,10 @@ namespace AnimeArchive
         /// <summary>
         /// Initialize all the required data
         /// </summary>
-        public static void InitializeData()
+        public static async Task InitializeData()
         {
-            ReadAnime();
-            ReadOtherList();
+            await ReadAnime();
+            await ReadOtherList();
             SetCompanyList();
         }
 
@@ -76,7 +79,7 @@ namespace AnimeArchive
         /// <summary>
         /// Read anime list from local storage
         /// </summary>
-        public static async void ReadAnime()
+        public static async Task<bool> ReadAnime()
         {
             try
             {
@@ -94,8 +97,9 @@ namespace AnimeArchive
             }
             catch (Exception)
             {
-                Global.Animes = new ObservableCollection<Anime>();
+                return false;
             }
+            return true;
         }
 
         /// <summary>
@@ -119,7 +123,7 @@ namespace AnimeArchive
         /// <summary>
         /// Read other list from local storage
         /// </summary>
-        public static async void ReadOtherList()
+        public static async Task<bool> ReadOtherList()
         {
             try
             {
@@ -137,8 +141,9 @@ namespace AnimeArchive
             }
             catch (Exception)
             {
-                Global.OtherLists = new ObservableCollection<OtherList>();
+                return false;
             }
+            return true;
         }
 
         /// <summary>
@@ -174,7 +179,7 @@ namespace AnimeArchive
         /// <summary>
         /// Import anime from user selected file
         /// </summary>
-        public static async void ImportAnime()
+        public static async Task<bool> ImportAnime()
         {
             // Load the flag of the anime through file picker
             FileOpenPicker openPicker = new FileOpenPicker
@@ -188,7 +193,7 @@ namespace AnimeArchive
             {
                 StorageFile file = await openPicker.PickSingleFileAsync();
 
-                if (file == null) return;
+                if (file == null) return false;
 
                 string xml = await FileIO.ReadTextAsync(file);
 
@@ -208,7 +213,9 @@ namespace AnimeArchive
             {
                 var dialog = new MessageDialog("", "Import Failed");
                 await dialog.ShowAsync();
+                return false;
             }
+            return true;
         }
 
         /// <summary>
@@ -244,7 +251,7 @@ namespace AnimeArchive
         /// <summary>
         /// Import other list from user selected file
         /// </summary>
-        public static async void ImportOtherList()
+        public static async Task<bool> ImportOtherList()
         {
             // Load the flag of the anime through file picker
             FileOpenPicker openPicker = new FileOpenPicker
@@ -258,7 +265,7 @@ namespace AnimeArchive
             {
                 StorageFile file = await openPicker.PickSingleFileAsync();
 
-                if (file == null) return;
+                if (file == null) return false;
 
                 string xml = await FileIO.ReadTextAsync(file);
 
@@ -278,7 +285,9 @@ namespace AnimeArchive
             {
                 var dialog = new MessageDialog("", "Import Failed");
                 await dialog.ShowAsync();
+                return false;
             }
+            return true;
         }
 
         /// <summary>
