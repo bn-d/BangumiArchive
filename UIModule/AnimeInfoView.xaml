@@ -89,7 +89,7 @@
                 <FontIcon Glyph="&#59243;"/>
             </AppBarButton.Icon>
         </AppBarButton>
-        <AppBarButton Click="NextAnime"
+        <AppBarButton Click="NextAnimeAsync"
                       VerticalAlignment="Center" HorizontalAlignment="Right">
             <AppBarButton.Icon>
                 <FontIcon Glyph="&#59244;"/>

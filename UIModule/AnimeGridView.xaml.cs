@@ -14,12 +14,14 @@ namespace AnimeArchive.UIModule
     /// </summary>
     public sealed partial class AnimeGridView : Page
     {
-        private ObservableCollection<Anime> _filteredAnime;
-        private bool _isFiltered;
+
+        public static GridView StaticAnimeGrid;
 
         public AnimeGridView()
         {
             InitializeComponent();
+
+            StaticAnimeGrid = AnimeGrid;
         }
 
         /// <summary>
@@ -28,11 +30,21 @@ namespace AnimeArchive.UIModule
         /// <param name="e"></param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            AnimeGrid.ItemsSource = null;
-            if (!_isFiltered)
+            if (!Global.IsFiltered)
                 AnimeGrid.ItemsSource = Global.Animes;
             else
-                AnimeGrid.ItemsSource = _filteredAnime;
+                AnimeGrid.ItemsSource = Global.FilteredAnimes;
+        }
+
+        /// <summary>
+        /// Upfate the anime grid
+        /// </summary>
+        public static void UpdateGrid()
+        {
+            if (!Global.IsFiltered)
+                StaticAnimeGrid.ItemsSource = Global.Animes;
+            else
+                StaticAnimeGrid.ItemsSource = Global.FilteredAnimes;
         }
 
         /// <summary>
@@ -169,17 +181,24 @@ namespace AnimeArchive.UIModule
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void FilterAnime(object sender, RoutedEventArgs e)
+        private void FilterAnimeClick(object sender, RoutedEventArgs e) => FilterAnime();
+
+        /// <summary>
+        /// Filter the anime according to the user's specification
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void FilterAnime()
         {
-            _filteredAnime = new ObservableCollection<Anime>();
+            Global.FilteredAnimes = new ObservableCollection<Anime>();
 
             foreach (Anime a in Global.Animes)
             {
                 if (FilterAnimeHelper(a))
-                    _filteredAnime.Add(a);
+                    Global.FilteredAnimes.Add(a);
             }
-            _isFiltered = true;
-            AnimeGrid.ItemsSource = _filteredAnime;
+            Global.IsFiltered = true;
+            AnimeGrid.ItemsSource = Global.FilteredAnimes;
         }
 
         private bool FilterAnimeHelper(Anime a)
@@ -280,7 +299,7 @@ namespace AnimeArchive.UIModule
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ClearFilter(object sender, RoutedEventArgs e)
+        private void ClearFilterClick(object sender, RoutedEventArgs e)
         {
             WatchingCB.IsChecked = NWatchedCB.IsChecked = false;
             RankAllCB.IsChecked = true;
@@ -289,10 +308,10 @@ namespace AnimeArchive.UIModule
 
             CompanyTB.Text = "";
 
-            if (_isFiltered)
+            if (Global.IsFiltered)
             {
                 AnimeGrid.ItemsSource = Global.Animes;
-                _isFiltered = false;
+                Global.IsFiltered = false;
             }
         }
 

@@ -16,7 +16,7 @@
                       CanDragItems="True" CanReorderItems="True" AllowDrop="True" 
                       SelectionMode="None" Padding="50"/>
         </ScrollViewer>
-        <CommandBar Background="{x:Null}">
+        <CommandBar Background="{x:Null}" BorderThickness="0" Margin="0,0,20,0">
             <CommandBar.SecondaryCommands>
                 <AppBarButton Label="Export" Click="ExportOtherList"/>
                 <AppBarButton Label="Import" Click="ImportOtherList"/>

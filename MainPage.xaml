@@ -7,7 +7,7 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Pivot>
+        <Pivot Name="MainPivot">
             <PivotItem Header="Anime List">
                 <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled" Background="Black">
                     <Grid.RowDefinitions>

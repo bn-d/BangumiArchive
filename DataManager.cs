@@ -19,6 +19,9 @@ namespace AnimeArchive
     {
         public static ObservableCollection<Anime> Animes = 
             new ObservableCollection<Anime>();
+
+        public static ObservableCollection<Anime> FilteredAnimes;
+        public static bool IsFiltered;
         public static HashSet<string> CompanyHashSet;
 
         public static ObservableCollection<OtherList> OtherLists = 

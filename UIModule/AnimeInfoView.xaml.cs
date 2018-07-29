@@ -121,10 +121,26 @@ namespace AnimeArchive.UIModule
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void NextAnime(object sender, RoutedEventArgs e)
+        private async void NextAnimeAsync(object sender, RoutedEventArgs e)
         {
             if (_curAnime.Index < Global.Animes.Count)
                 Frame.Navigate(typeof(AnimeInfoView), _curAnime.Index);
+            else
+            {
+                // Show input dialog to get the new anime name
+                var dialog = new InputDialog();
+                var result = await dialog.ShowAsync();
+
+                if (result != ContentDialogResult.Primary) return;
+
+                int indx = Global.Animes.Count;
+
+                // Create new anime
+                string name = (string)dialog.Text;
+                Global.Animes.Add(new Anime(indx + 1, name));
+
+                Frame.Navigate(typeof(AnimeInfoView), _curAnime.Index);
+            }
         }
 
         private void SaveAnime(object sender, RoutedEventArgs e) =>

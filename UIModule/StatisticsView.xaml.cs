@@ -148,6 +148,66 @@ namespace AnimeArchive.UIModule
         {
             CompanyRank.ItemsSource = companyReviewRank;
         }
+
+        /// <summary>
+        /// Navigate to anime grid view and show animes with clicked review
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ReviewItemClick(object sender, ItemClickEventArgs e)
+        {
+            Pair p = (Pair)e.ClickedItem;
+            int rank;
+            switch (p.Name)
+            {
+                case "Rank 5": rank = 0; break;
+                case "Rank 4": rank = 1; break;
+                case "Rank 3": rank = 2; break;
+                case "Rank 2": rank = 3; break;
+                case "Rank 1": rank = 4; break;
+                default:       rank = 5; break;
+            }
+
+            Global.FilteredAnimes = new ObservableCollection<Anime>();
+
+            foreach (Anime a in Global.Animes)
+            {
+                if (a.Rank == rank)
+                    Global.FilteredAnimes.Add(a);
+            }
+            Global.IsFiltered = true;
+            AnimeGridView.UpdateGrid();
+            MainPage.NavigateAnimeGridView();
+        }
+
+        /// <summary>
+        /// Navigate to anime grid view and show animes with clicked company
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CompanyItemClick(object sender, ItemClickEventArgs e)
+        {
+            Pair p = (Pair) e.ClickedItem;
+            Global.FilteredAnimes = new ObservableCollection<Anime>();
+
+            foreach (Anime a in Global.Animes)
+            {
+                bool company = false;
+                foreach (Season s in a.Seasons)
+                {
+                    if (s.Company == p.Name)
+                    {
+                        company = true;
+                        break;
+                    }
+                }
+                if (company)
+                    Global.FilteredAnimes.Add(a);
+            }
+            Global.IsFiltered = true;
+            AnimeGridView.UpdateGrid();
+            MainPage.NavigateAnimeGridView();
+        }
     }
 
     /// <summary>

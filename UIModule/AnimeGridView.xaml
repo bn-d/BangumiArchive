@@ -42,9 +42,9 @@
                                 LostFocus="TrimTextSuggest" TextChanged="CompanyTextChanged"/>
 
                 <StackPanel Orientation="Horizontal" Margin="0,50,0,0" HorizontalAlignment="Right">
-                    <Button Content="Clear" Click="ClearFilter"/>
+                    <Button Content="Clear" Click="ClearFilterClick"/>
                     <Button Content="Filter" 
-                            Click="FilterAnime" Margin="10,0,0,0"/>
+                            Click="FilterAnimeClick" Margin="10,0,0,0"/>
                 </StackPanel>
             </StackPanel>
         </SplitView.Pane>
@@ -57,7 +57,7 @@
                           SelectionMode="None"
                           ItemTemplate="{StaticResource AnimeGridItem}"/>
             </ScrollViewer>
-            <CommandBar Background="{x:Null}">
+            <CommandBar Background="{x:Null}" Margin="0,0,20,0">
                 <CommandBar.Content>
                     <StackPanel Orientation="Horizontal">
                         <AppBarButton Icon="Filter" Click="ChangeFilterSplitView"/>
