@@ -9,6 +9,10 @@ using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.UI.Popups;
 using AnimeArchive.UIModule;
+using Windows.Security.Cryptography.Core;
+using Windows.Storage.Streams;
+using Windows.Security.Cryptography;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace AnimeArchive
 {
@@ -38,8 +42,13 @@ namespace AnimeArchive
     /// </summary>
     internal class DataManager
     {
+        private static string _animeHash = "";
+        private static string _otherHash = "";
         private static string _animeDataName = "animes.dat";
         private static string _otherDataName = "other.dat";
+
+
+        private static HashAlgorithmProvider md5 = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Md5);
 
         /// <summary>
         /// Initialize all the required data
@@ -76,6 +85,8 @@ namespace AnimeArchive
                 StorageFile file = await Global.LocalFolder.CreateFileAsync(_animeDataName,
                     CreationCollisionOption.ReplaceExisting);
                 await FileIO.WriteTextAsync(file, reader.ReadToEnd());
+
+                _animeHash = ComputeStreamHash(memoryStream);
             }
         }
 
@@ -96,6 +107,8 @@ namespace AnimeArchive
                     stream.Position = 0;
                     DataContractSerializer deserializer = new DataContractSerializer(typeof(ObservableCollection<Anime>));
                     Global.Animes = (ObservableCollection<Anime>)deserializer.ReadObject(stream);
+
+                    _animeHash = ComputeStreamHash((MemoryStream) stream);
                 }
             }
             catch (Exception)
@@ -120,6 +133,8 @@ namespace AnimeArchive
                 StorageFile file = await Global.LocalFolder.CreateFileAsync(_otherDataName,
                     CreationCollisionOption.ReplaceExisting);
                 await FileIO.WriteTextAsync(file, reader.ReadToEnd());
+
+                _otherHash = ComputeStreamHash(memoryStream);
             }
         }
 
@@ -140,6 +155,8 @@ namespace AnimeArchive
                     stream.Position = 0;
                     DataContractSerializer deserializer = new DataContractSerializer(typeof(ObservableCollection<OtherList>));
                     Global.OtherLists = (ObservableCollection<OtherList>)deserializer.ReadObject(stream);
+
+                    _otherHash = ComputeStreamHash((MemoryStream)stream);
                 }
             }
             catch (Exception)
@@ -174,7 +191,7 @@ namespace AnimeArchive
 
                 await FileIO.WriteTextAsync(file, reader.ReadToEnd());
 
-                var dialog = new MessageDialog("", "Export Successful");
+                var dialog = new MessageDialog(string.Format("{0} animes successfully exported", Global.Animes.Count), "Export succeeded");
                 await dialog.ShowAsync();
             }
         }
@@ -208,7 +225,7 @@ namespace AnimeArchive
                     DataContractSerializer deserializer = new DataContractSerializer(typeof(ObservableCollection<Anime>));
                     Global.Animes = (ObservableCollection<Anime>)deserializer.ReadObject(stream);
 
-                    var dialog = new MessageDialog("", string.Format("Import {0} anime Successful", Global.Animes.Count));
+                    var dialog = new MessageDialog(string.Format("{0} animes successfully imported", Global.Animes.Count), "Import succeeded");
                     await dialog.ShowAsync();
                 }
             }
@@ -246,7 +263,7 @@ namespace AnimeArchive
 
                 await FileIO.WriteTextAsync(file, reader.ReadToEnd());
 
-                var dialog = new MessageDialog("", "Export Successful");
+                var dialog = new MessageDialog(string.Format("{0} lists successfully exported", Global.OtherLists.Count), "Export succeed");
                 await dialog.ShowAsync();
             }
         }
@@ -280,7 +297,7 @@ namespace AnimeArchive
                     DataContractSerializer deserializer = new DataContractSerializer(typeof(ObservableCollection<OtherList>));
                     Global.OtherLists = (ObservableCollection<OtherList>)deserializer.ReadObject(stream);
 
-                    var dialog = new MessageDialog("", string.Format("Import {0} list Successful", Global.OtherLists.Count));
+                    var dialog = new MessageDialog(string.Format("{0} lists successfully imported", Global.OtherLists.Count), "Import succeed");
                     await dialog.ShowAsync();
                 }
             }
@@ -307,5 +324,51 @@ namespace AnimeArchive
                 }
             }
         }
+        
+        /// <summary>
+        /// Check whether data have changed since last saving
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsDataChanged()
+        {
+            string curAnimeHash = ComputeHash(Global.Animes);
+            if (!_animeHash.Equals(curAnimeHash))
+                return true;
+            string curOtherHash = ComputeHash(Global.OtherLists);
+            if (!_otherHash.Equals(curOtherHash))
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Compute the hash of an object
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns> 
+        // Reference: https://alexmg.com/posts/compute-any-hash-for-any-object-in-c
+        private static string ComputeHash(object obj)
+        {
+            DataContractSerializer serializer = new DataContractSerializer(obj.GetType());
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                serializer.WriteObject(memoryStream, obj);
+                return ComputeStreamHash(memoryStream);
+            }
+        }
+
+        /// <summary>
+        /// Compute the hash of a memory stream
+        /// </summary>
+        /// <param name="memoryStream"></param>
+        /// <returns></returns>
+        private static string ComputeStreamHash(MemoryStream memoryStream)
+        {
+            memoryStream.Position = 0;
+            IBuffer buffHash = md5.HashData(memoryStream.GetWindowsRuntimeBuffer());
+            //Debug.WriteLine(CryptographicBuffer.EncodeToBase64String(buffHash));
+            return CryptographicBuffer.EncodeToBase64String(buffHash);
+        }
+
     }
 }

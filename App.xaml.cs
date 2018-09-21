@@ -1,18 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using Windows.UI.Core.Preview;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 namespace AnimeArchive
@@ -42,6 +34,8 @@ namespace AnimeArchive
             // Iniitialize all the data
             await DataManager.InitializeData();
 
+            SystemNavigationManagerPreview.GetForCurrentView().CloseRequested += OnClosingAsync;
+
             Frame rootFrame = Window.Current.Content as Frame;
 
             // Do not repeat app initialization when the Window already has content,
@@ -52,11 +46,6 @@ namespace AnimeArchive
                 rootFrame = new Frame();
 
                 rootFrame.NavigationFailed += OnNavigationFailed;
-
-                if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
-                {
-                    //TODO: Load state from previously suspended application
-                }
 
                 // Place the frame in the current Window
                 Window.Current.Content = rootFrame;
@@ -71,6 +60,7 @@ namespace AnimeArchive
                     // parameter
                     rootFrame.Navigate(typeof(MainPage), e.Arguments);
                 }
+
                 // Ensure the current window is active
                 Window.Current.Activate();
             }
@@ -96,8 +86,40 @@ namespace AnimeArchive
         private void OnSuspending(object sender, SuspendingEventArgs e)
         {
             var deferral = e.SuspendingOperation.GetDeferral();
-            //TODO: Save application state and stop any background activity
             deferral.Complete();
         }
+
+        /// <summary>
+        /// Invoked when application is being closed by the user.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void OnClosingAsync(object sender, SystemNavigationCloseRequestedPreviewEventArgs e)
+        {
+            var deferral = e.GetDeferral();
+            if (DataManager.IsDataChanged())
+            {
+                var dialog = new MessageDialog("There are unsaved changes to AnimeArchive", "Do you want to save your changes?");
+                var saveCommand = new UICommand("Save");
+                var dontSaveCommand = new UICommand("Don't save");
+                var cancelCommand = new UICommand("Cancel");
+                dialog.Commands.Add(saveCommand);
+                dialog.Commands.Add(dontSaveCommand);
+                dialog.Commands.Add(cancelCommand);
+
+                var res = await dialog.ShowAsync();
+                if (res == cancelCommand)
+                {
+                    e.Handled = true;
+                }
+                else if (res == saveCommand)
+                {
+                    DataManager.SaveData();
+                }
+            }
+
+            deferral.Complete();
+        }
+
     }
 }

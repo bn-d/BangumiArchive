@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.16
+VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimeArchive", "AnimeArchive.csproj", "{DBB44D33-917B-4C1C-BE50-458D46B104B4}"
 EndProject
@@ -30,9 +30,9 @@ Global
 		{DBB44D33-917B-4C1C-BE50-458D46B104B4}.Release|x64.ActiveCfg = Release|x64
 		{DBB44D33-917B-4C1C-BE50-458D46B104B4}.Release|x64.Build.0 = Release|x64
 		{DBB44D33-917B-4C1C-BE50-458D46B104B4}.Release|x64.Deploy.0 = Release|x64
-		{DBB44D33-917B-4C1C-BE50-458D46B104B4}.Release|x86.ActiveCfg = Release|x86
-		{DBB44D33-917B-4C1C-BE50-458D46B104B4}.Release|x86.Build.0 = Release|x86
-		{DBB44D33-917B-4C1C-BE50-458D46B104B4}.Release|x86.Deploy.0 = Release|x86
+		{DBB44D33-917B-4C1C-BE50-458D46B104B4}.Release|x86.ActiveCfg = Release|x64
+		{DBB44D33-917B-4C1C-BE50-458D46B104B4}.Release|x86.Build.0 = Release|x64
+		{DBB44D33-917B-4C1C-BE50-458D46B104B4}.Release|x86.Deploy.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

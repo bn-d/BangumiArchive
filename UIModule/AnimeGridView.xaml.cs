@@ -4,7 +4,6 @@ using System.Linq;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using System.Collections.ObjectModel;
-using Windows.UI.Popups;
 using Windows.UI.Xaml.Navigation;
 
 namespace AnimeArchive.UIModule
@@ -30,6 +29,7 @@ namespace AnimeArchive.UIModule
         /// <param name="e"></param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+            AnimeGrid.ItemsSource = null;
             if (!Global.IsFiltered)
                 AnimeGrid.ItemsSource = Global.Animes;
             else
