@@ -1,2 +1,2 @@
 # AnimeArchive
-A UWP app that can keep track the anime/TV series you watched.
+UWP app that can keep track of anime/TV series.
