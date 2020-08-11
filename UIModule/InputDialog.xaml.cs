@@ -2,7 +2,7 @@
 
 // The Content Dialog item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
-namespace AnimeArchive.UIModule
+namespace BangumiArchive.UIModule
 {
     /// <summary>
     /// A content dialog for the input of the name of anime

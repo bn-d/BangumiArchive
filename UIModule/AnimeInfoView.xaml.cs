@@ -8,7 +8,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 
 
-namespace AnimeArchive.UIModule
+namespace BangumiArchive.UIModule
 {
     /// <summary>
     /// The view of the detailed information of an anime
@@ -16,7 +16,7 @@ namespace AnimeArchive.UIModule
     public sealed partial class AnimeInfoView : Page
     {
         // The object of current anime
-        private Anime _curAnime;
+        private Series _curAnime;
 
         public AnimeInfoView()
         {
@@ -32,7 +32,7 @@ namespace AnimeArchive.UIModule
         {
             int indx = (int) e.Parameter;
             _curAnime = Global.Animes[indx];
-            RankBar.Fill = Anime.GetRankColorBrush(_curAnime.Rank);
+            RankBar.Fill = Series.GetRankColorBrush(_curAnime.Rank);
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace AnimeArchive.UIModule
         private void ChangeRank(object sender, RoutedEventArgs e)
         {
             _curAnime.Rank = 5 - int.Parse(((MenuFlyoutItem)sender).Text);
-            RankBar.Fill = Anime.GetRankColorBrush(_curAnime.Rank);
+            RankBar.Fill = Series.GetRankColorBrush(_curAnime.Rank);
         }
 
         /// <summary>
@@ -137,7 +137,7 @@ namespace AnimeArchive.UIModule
 
                 // Create new anime
                 string name = (string)dialog.Text;
-                Global.Animes.Add(new Anime(indx + 1, name));
+                Global.Animes.Add(new Series(indx + 1, name));
 
                 Frame.Navigate(typeof(AnimeInfoView), _curAnime.Index);
             }

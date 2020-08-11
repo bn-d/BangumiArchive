@@ -1,9 +1,9 @@
 ﻿<ResourceDictionary
-    x:Class="AnimeArchive.UIModule.UIDictionary"
+    x:Class="BangumiArchive.UIModule.UIDictionary"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:global="using:AnimeArchive"
-    xmlns:local="using:AnimeArchive.UIModule">
+    xmlns:global="using:BangumiArchive"
+    xmlns:local="using:BangumiArchive.UIModule">
 
     <global:TimeConverter x:Key="TimeConverter"/>
     <global:RankColorConverter x:Key="RankColorConverter"/>

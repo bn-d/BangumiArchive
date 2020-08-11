@@ -10,7 +10,7 @@ using Windows.UI.Xaml.Media;
 using ListView = Windows.UI.Xaml.Controls.ListView;
 using TextBox = Windows.UI.Xaml.Controls.TextBox;
 
-namespace AnimeArchive.UIModule
+namespace BangumiArchive.UIModule
 {
     public partial class UIDictionary
     {

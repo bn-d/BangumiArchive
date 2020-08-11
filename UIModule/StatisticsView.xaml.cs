@@ -7,7 +7,7 @@ using Windows.UI.Xaml.Controls;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
-namespace AnimeArchive.UIModule
+namespace BangumiArchive.UIModule
 {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
@@ -63,7 +63,7 @@ namespace AnimeArchive.UIModule
 
             SongList = new ObservableCollection<string>();
 
-            foreach (Anime a in Global.Animes)
+            foreach (Series a in Global.Animes)
             {
                 if (UIDictionary.NullBToBool(a.IsWatching))
                     watchingNum += 1;
@@ -168,9 +168,9 @@ namespace AnimeArchive.UIModule
                 default:       rank = 5; break;
             }
 
-            Global.FilteredAnimes = new ObservableCollection<Anime>();
+            Global.FilteredAnimes = new ObservableCollection<Series>();
 
-            foreach (Anime a in Global.Animes)
+            foreach (Series a in Global.Animes)
             {
                 if (a.Rank == rank)
                     Global.FilteredAnimes.Add(a);
@@ -188,9 +188,9 @@ namespace AnimeArchive.UIModule
         private void CompanyItemClick(object sender, ItemClickEventArgs e)
         {
             Pair p = (Pair) e.ClickedItem;
-            Global.FilteredAnimes = new ObservableCollection<Anime>();
+            Global.FilteredAnimes = new ObservableCollection<Series>();
 
-            foreach (Anime a in Global.Animes)
+            foreach (Series a in Global.Animes)
             {
                 bool company = false;
                 foreach (Season s in a.Seasons)

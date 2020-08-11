@@ -8,23 +8,23 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.UI.Popups;
-using AnimeArchive.UIModule;
+using BangumiArchive.UIModule;
 using Windows.Security.Cryptography.Core;
 using Windows.Storage.Streams;
 using Windows.Security.Cryptography;
 using System.Runtime.InteropServices.WindowsRuntime;
 
-namespace AnimeArchive
+namespace BangumiArchive
 {
     /// <summary>
     /// A class for all the global variable
     /// </summary>
     internal class Global
     {
-        public static ObservableCollection<Anime> Animes = 
-            new ObservableCollection<Anime>();
+        public static ObservableCollection<Series> Animes = 
+            new ObservableCollection<Series>();
 
-        public static ObservableCollection<Anime> FilteredAnimes;
+        public static ObservableCollection<Series> FilteredAnimes;
         public static bool IsFiltered;
         public static HashSet<string> CompanyHashSet;
 
@@ -78,7 +78,7 @@ namespace AnimeArchive
             using (MemoryStream memoryStream = new MemoryStream())
             using (StreamReader reader = new StreamReader(memoryStream))
             {
-                DataContractSerializer serializer = new DataContractSerializer(typeof(ObservableCollection<Anime>));
+                DataContractSerializer serializer = new DataContractSerializer(typeof(ObservableCollection<Series>));
                 serializer.WriteObject(memoryStream, Global.Animes);
                 memoryStream.Position = 0;
 
@@ -105,8 +105,8 @@ namespace AnimeArchive
                     byte[] data = Encoding.UTF8.GetBytes(xml);
                     stream.Write(data, 0, data.Length);
                     stream.Position = 0;
-                    DataContractSerializer deserializer = new DataContractSerializer(typeof(ObservableCollection<Anime>));
-                    Global.Animes = (ObservableCollection<Anime>)deserializer.ReadObject(stream);
+                    DataContractSerializer deserializer = new DataContractSerializer(typeof(ObservableCollection<Series>));
+                    Global.Animes = (ObservableCollection<Series>)deserializer.ReadObject(stream);
 
                     _animeHash = ComputeStreamHash((MemoryStream) stream);
                 }
@@ -185,7 +185,7 @@ namespace AnimeArchive
             using (MemoryStream memoryStream = new MemoryStream())
             using (StreamReader reader = new StreamReader(memoryStream))
             {
-                DataContractSerializer serializer = new DataContractSerializer(typeof(ObservableCollection<Anime>));
+                DataContractSerializer serializer = new DataContractSerializer(typeof(ObservableCollection<Series>));
                 serializer.WriteObject(memoryStream, Global.Animes);
                 memoryStream.Position = 0;
 
@@ -222,8 +222,8 @@ namespace AnimeArchive
                     byte[] data = Encoding.UTF8.GetBytes(xml);
                     stream.Write(data, 0, data.Length);
                     stream.Position = 0;
-                    DataContractSerializer deserializer = new DataContractSerializer(typeof(ObservableCollection<Anime>));
-                    Global.Animes = (ObservableCollection<Anime>)deserializer.ReadObject(stream);
+                    DataContractSerializer deserializer = new DataContractSerializer(typeof(ObservableCollection<Series>));
+                    Global.Animes = (ObservableCollection<Series>)deserializer.ReadObject(stream);
 
                     var dialog = new MessageDialog(string.Format("{0} animes successfully imported", Global.Animes.Count), "Import succeeded");
                     await dialog.ShowAsync();
@@ -316,7 +316,7 @@ namespace AnimeArchive
         public static void SetCompanyList()
         {
             Global.CompanyHashSet = new HashSet<string>();
-            foreach (Anime a in Global.Animes)
+            foreach (Series a in Global.Animes)
             {
                 foreach (Season s in a.Seasons)
                 {

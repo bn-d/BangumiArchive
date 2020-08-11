@@ -1,7 +1,7 @@
 ﻿using Windows.UI.Xaml.Controls;
-using AnimeArchive.UIModule;
+using BangumiArchive.UIModule;
 
-namespace AnimeArchive
+namespace BangumiArchive
 {
     public sealed partial class MainPage : Page
     {

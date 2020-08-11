@@ -5,8 +5,9 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using System.Collections.ObjectModel;
 using Windows.UI.Xaml.Navigation;
+using System.Threading.Tasks;
 
-namespace AnimeArchive.UIModule
+namespace BangumiArchive.UIModule
 {
     /// <summary>
     /// The main anime grid view of the app
@@ -54,14 +55,14 @@ namespace AnimeArchive.UIModule
         /// <param name="e"></param>
         private void AnimeItemClick(object sender, ItemClickEventArgs e)
         {
-            ShowAnimeDetail((Anime) e.ClickedItem);
+            ShowAnimeDetail((Series) e.ClickedItem);
         }
 
         /// <summary>
         /// Display detailed anime info in another frame
         /// </summary>
         /// <param name="anime"></param>
-        private void ShowAnimeDetail(Anime anime)
+        private void ShowAnimeDetail(Series anime)
         {
             Frame.Navigate(typeof(AnimeInfoView), anime.Index - 1);
         }
@@ -83,7 +84,7 @@ namespace AnimeArchive.UIModule
 
             // Create new anime
             string name = (string) dialog.Text;
-            Global.Animes.Add(new Anime(indx + 1, name));
+            Global.Animes.Add(new Series(indx + 1, name));
 
             // Scroll to the new anime
             AnimeGrid.ScrollIntoView(Global.Animes[indx]);
@@ -112,9 +113,9 @@ namespace AnimeArchive.UIModule
         {
             if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput && sender.Text.Any())
             {
-                var suggestions = new List<Anime>();
+                var suggestions = new List<Series>();
 
-                foreach (Anime a in Global.Animes)
+                foreach (Series a in Global.Animes)
                 {
                     if (a.Title.IndexOf(sender.Text, StringComparison.CurrentCultureIgnoreCase) >= 0
                         || a.SubTitle.IndexOf(sender.Text, StringComparison.CurrentCultureIgnoreCase) >= 0)
@@ -137,9 +138,9 @@ namespace AnimeArchive.UIModule
         /// <param name="args"></param>
         private void SearchQuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
-            if (args.ChosenSuggestion != null && args.ChosenSuggestion is Anime)
+            if (args.ChosenSuggestion != null && args.ChosenSuggestion is Series)
             {
-                ShowAnimeDetail((Anime)args.ChosenSuggestion);
+                ShowAnimeDetail((Series)args.ChosenSuggestion);
             }
         }
 
@@ -190,53 +191,25 @@ namespace AnimeArchive.UIModule
         /// <param name="e"></param>
         private void FilterAnime()
         {
-            Global.FilteredAnimes = new ObservableCollection<Anime>();
+            Global.FilteredAnimes = new ObservableCollection<Series>();
 
-            foreach (Anime a in Global.Animes)
+            foreach (Series a in Global.Animes)
             {
                 if (FilterAnimeHelper(a))
+                {
                     Global.FilteredAnimes.Add(a);
+                }
             }
             Global.IsFiltered = true;
             AnimeGrid.ItemsSource = Global.FilteredAnimes;
         }
 
-        private bool FilterAnimeHelper(Anime a)
+        private bool FilterAnimeHelper(Series a)
         {
-            if (UIDictionary.NullBToBool(WatchingCB.IsChecked) && 
-                !UIDictionary.NullBToBool(a.IsWatching))
-                return false;
-
-            bool neverWatch = false;
-            if (!UIDictionary.NullBToBool(NWatchedCB.IsChecked))
-                neverWatch = true;
-            else
+            // Company
+            if (CompanyTB.Text != "")
             {
-                foreach (Season s in a.Seasons)
-                {
-                    if (s.Time == 0)
-                    {
-                        neverWatch = true;
-                        break;
-                    }
-                }
-            }
-            if (!neverWatch)
-                return false;
-
-            if (!((a.Rank == 0 && UIDictionary.NullBToBool(Rank5CB.IsChecked)) ||
-                  (a.Rank == 1 && UIDictionary.NullBToBool(Rank4CB.IsChecked)) ||
-                  (a.Rank == 2 && UIDictionary.NullBToBool(Rank3CB.IsChecked)) ||
-                  (a.Rank == 3 && UIDictionary.NullBToBool(Rank2CB.IsChecked)) ||
-                  (a.Rank == 4 && UIDictionary.NullBToBool(Rank1CB.IsChecked)) ||
-                  (a.Rank == 5 && UIDictionary.NullBToBool(NoRankCB.IsChecked))))
-                return false;
-
-            bool company = false;
-            if (CompanyTB.Text == "")
-                company = true;
-            else
-            {
+                bool company = false;
                 foreach (Season s in a.Seasons)
                 {
                     if (s.Company == CompanyTB.Text)
@@ -245,10 +218,40 @@ namespace AnimeArchive.UIModule
                         break;
                     }
                 }
+                if (!company)
+                    return false;
             }
-            if (!company)
+
+            // Rank
+            if (!((a.Rank == 0 && UIDictionary.NullBToBool(Rank5CB.IsChecked)) ||
+                  (a.Rank == 1 && UIDictionary.NullBToBool(Rank4CB.IsChecked)) ||
+                  (a.Rank == 2 && UIDictionary.NullBToBool(Rank3CB.IsChecked)) ||
+                  (a.Rank == 3 && UIDictionary.NullBToBool(Rank2CB.IsChecked)) ||
+                  (a.Rank == 4 && UIDictionary.NullBToBool(Rank1CB.IsChecked)) ||
+                  (a.Rank == 5 && UIDictionary.NullBToBool(NoRankCB.IsChecked))))
                 return false;
 
+            // Is Watching
+            if (UIDictionary.NullBToBool(WatchingCB.IsChecked) && 
+            !UIDictionary.NullBToBool(a.IsWatching))
+            return false;
+
+            // Never watched
+            if (UIDictionary.NullBToBool(NWatchedCB.IsChecked))
+            {
+                bool neverWatch = false;
+                foreach (Season s in a.Seasons)
+                {
+                    if (s.Time == 0)
+                    {
+                        neverWatch = true;
+                        break;
+                    }
+                }
+                if (!neverWatch)
+                    return false;
+            }
+            
             return true;
         }
 
