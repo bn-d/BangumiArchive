@@ -61,10 +61,15 @@ namespace BangumiArchive.UIModule
         /// <summary>
         /// Display detailed anime info in another frame
         /// </summary>
-        /// <param name="anime"></param>
-        private void ShowAnimeDetail(Series anime)
+        /// <param name="series"></param>
+        public void ShowAnimeDetail(Series series)
         {
-            Frame.Navigate(typeof(AnimeInfoView), anime.Index - 1);
+            Frame.Navigate(typeof(AnimeInfoView), series.Index - 1);
+        }
+
+        public void ShowAnimeDetail(int index)
+        {
+            Frame.Navigate(typeof(AnimeInfoView), index);
         }
 
         /// <summary>
@@ -138,9 +143,9 @@ namespace BangumiArchive.UIModule
         /// <param name="args"></param>
         private void SearchQuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
-            if (args.ChosenSuggestion != null && args.ChosenSuggestion is Series)
+            if (args.ChosenSuggestion != null && args.ChosenSuggestion is Series series)
             {
-                ShowAnimeDetail((Series)args.ChosenSuggestion);
+                ShowAnimeDetail(series);
             }
         }
 
@@ -233,7 +238,7 @@ namespace BangumiArchive.UIModule
 
             // Is Watching
             if (UIDictionary.NullBToBool(WatchingCB.IsChecked) && 
-            !UIDictionary.NullBToBool(a.IsWatching))
+            !UIDictionary.NullBToBool(a.IsWatchingNullable))
             return false;
 
             // Never watched

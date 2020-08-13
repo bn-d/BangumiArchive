@@ -206,7 +206,7 @@ namespace BangumiArchive
             {
                 ViewMode = PickerViewMode.Thumbnail,
                 SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
-                FileTypeFilter = { ".dat" }
+                FileTypeFilter = { ".xml" }
             };
 
             try
@@ -229,9 +229,9 @@ namespace BangumiArchive
                     await dialog.ShowAsync();
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                var dialog = new MessageDialog("", "Import Failed");
+                var dialog = new MessageDialog(e.ToString(), "Import Failed");
                 await dialog.ShowAsync();
                 return false;
             }
@@ -247,7 +247,7 @@ namespace BangumiArchive
             {
                 SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
                 SuggestedFileName = _otherDataName,
-                FileTypeChoices = { { "Data", new List<string>() { ".dat" } } }
+                FileTypeChoices = { { "XML", new List<string>() { ".xml" } } }
             };
 
             var file = await savePicker.PickSaveFileAsync();

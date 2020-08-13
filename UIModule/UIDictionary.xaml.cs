@@ -5,6 +5,7 @@ using System.Linq;
 using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using ListView = Windows.UI.Xaml.Controls.ListView;
@@ -170,6 +171,20 @@ namespace BangumiArchive.UIModule
             }
             sender.ItemsSource = null;
             sender.ItemsSource = l;
+        }
+
+    }
+
+    public class IndexToNameConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            return Global.Animes[(int)value].Title;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
         }
     }
 }

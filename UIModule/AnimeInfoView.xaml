@@ -58,9 +58,9 @@
 
                 <StackPanel Orientation="Horizontal" 
                         VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,0,0,20">
-                    <CheckBox IsChecked="{x:Bind _curAnime.IsWatching, Mode=TwoWay}"
+                    <CheckBox IsChecked="{x:Bind _curAnime.IsWatchingNullable, Mode=TwoWay}"
                           Content="Watching" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-                    <CheckBox IsChecked="{x:Bind _curAnime.IsLive, Mode=TwoWay}"
+                    <CheckBox IsChecked="{x:Bind _curAnime.IsLiveNullable, Mode=TwoWay}"
                           Content="Live" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                 </StackPanel>
 

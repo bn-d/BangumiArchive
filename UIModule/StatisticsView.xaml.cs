@@ -5,8 +5,6 @@ using System.Linq;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
-
 namespace BangumiArchive.UIModule
 {
     /// <summary>
@@ -65,7 +63,7 @@ namespace BangumiArchive.UIModule
 
             foreach (Series a in Global.Animes)
             {
-                if (UIDictionary.NullBToBool(a.IsWatching))
+                if (UIDictionary.NullBToBool(a.IsWatchingNullable))
                     watchingNum += 1;
 
                 reviewRank[a.Rank].Num += 1;
