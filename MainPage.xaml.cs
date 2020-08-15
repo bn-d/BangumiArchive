@@ -1,5 +1,6 @@
 ﻿using Windows.UI.Xaml.Controls;
 using BangumiArchive.UIModule;
+using static BangumiArchive.DataManager;
 
 namespace BangumiArchive
 {
@@ -17,21 +18,23 @@ namespace BangumiArchive
             static_MainPageFrame = MainPageFrame;
 
             // Navigate to AnimeGridView
-            MainPageFrame.Navigate(typeof(AnimeGridView));
+            MainPageFrame.Navigate(typeof(MainView));
             ScheduleFrame.Navigate(typeof(ScheduleView));
             StatisticsFrame.Navigate(typeof(StatisticsView));
             OtherFrame.Navigate(typeof(OtherView));
             
         }
 
-        public static void NavigateAnimeGridView()
+        public static void NavigateMainView()
         {
+            static_MainPageFrame.Navigate(typeof(MainView));
             static_MainPivot.SelectedIndex = 0;
         }
 
-        public static void ShowAnimeDetail(int index)
+        public static void NavigateDetailView(SeriesIndex index)
         {
-            static_MainPageFrame.Navigate(typeof(AnimeInfoView), index);
+            static_MainPageFrame.Navigate(typeof(DetailView), index);
+            static_MainPivot.SelectedIndex = 0;
         }
     }
 }

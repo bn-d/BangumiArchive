@@ -13,19 +13,42 @@ using Windows.Security.Cryptography.Core;
 using Windows.Storage.Streams;
 using Windows.Security.Cryptography;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Linq;
 
 namespace BangumiArchive
 {
     /// <summary>
+    /// A class that wraps Series and index
+    /// </summary>
+    public class SeriesIndex
+    {
+        public int Index;
+
+        public SeriesIndex(int index) { Index = index; }
+
+        public string IndexString => (Index + 1).ToString();
+        public Series Series => DataManager.Series[Index];
+        public Series S => Series;
+
+        public bool HasNext() => Index < DataManager.SIs.Count - 1;
+        public SeriesIndex Next() => DataManager.SIs[Math.Min(Index + 1, DataManager.SIs.Count - 1)];
+        public bool HasPrev() => Index > 0;
+        public SeriesIndex Prev() => DataManager.SIs[Math.Max(Index - 1, 0)];
+
+        public override string ToString() { return Series.Title; }
+    }
+
+    /// <summary>
     /// A class for all the global variable
     /// </summary>
-    internal class Global
+    public static class DataManager
     {
-        public static ObservableCollection<Series> Animes = 
+        internal static ObservableCollection<Series> Series = 
             new ObservableCollection<Series>();
+        public static ObservableCollection<SeriesIndex> SeriesIndices =
+            new ObservableCollection<SeriesIndex>();
+        public static ObservableCollection<SeriesIndex> SIs => SeriesIndices;
 
-        public static ObservableCollection<Series> FilteredAnimes;
-        public static bool IsFiltered;
         public static HashSet<string> CompanyHashSet;
 
         public static ObservableCollection<OtherList> OtherLists = 
@@ -35,20 +58,27 @@ namespace BangumiArchive
             ApplicationData.Current.LocalSettings;
         public static StorageFolder LocalFolder =
             ApplicationData.Current.LocalFolder;
-    }
 
-    /// <summary>
-    /// A class for read and write anime data
-    /// </summary>
-    internal class DataManager
-    {
         private static string _animeHash = "";
         private static string _otherHash = "";
-        private static string _animeDataName = "animes.dat";
+        private static string _animeDataName = "animes.xml";
         private static string _otherDataName = "other.dat";
 
-
         private static HashAlgorithmProvider md5 = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Md5);
+
+        /// <summary>
+        /// Add a new series to the current Bangumi item
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static SeriesIndex AddSeries(string name)
+        {
+            int index = Series.Count;
+            Series.Add(new Series(index + 1, name));
+            SeriesIndices.Add(new SeriesIndex(index));
+
+            return SeriesIndices[index];
+        }
 
         /// <summary>
         /// Initialize all the required data
@@ -57,6 +87,7 @@ namespace BangumiArchive
         {
             await ReadAnime();
             await ReadOtherList();
+            ResetSeriesIndices();
             SetCompanyList();
         }
 
@@ -79,10 +110,10 @@ namespace BangumiArchive
             using (StreamReader reader = new StreamReader(memoryStream))
             {
                 DataContractSerializer serializer = new DataContractSerializer(typeof(ObservableCollection<Series>));
-                serializer.WriteObject(memoryStream, Global.Animes);
+                serializer.WriteObject(memoryStream, DataManager.Series);
                 memoryStream.Position = 0;
 
-                StorageFile file = await Global.LocalFolder.CreateFileAsync(_animeDataName,
+                StorageFile file = await DataManager.LocalFolder.CreateFileAsync(_animeDataName,
                     CreationCollisionOption.ReplaceExisting);
                 await FileIO.WriteTextAsync(file, reader.ReadToEnd());
 
@@ -97,7 +128,7 @@ namespace BangumiArchive
         {
             try
             {
-                StorageFile file = await Global.LocalFolder.GetFileAsync(_animeDataName);
+                StorageFile file = await DataManager.LocalFolder.GetFileAsync(_animeDataName);
                 string xml = await FileIO.ReadTextAsync(file);
 
                 using (Stream stream = new MemoryStream())
@@ -106,7 +137,7 @@ namespace BangumiArchive
                     stream.Write(data, 0, data.Length);
                     stream.Position = 0;
                     DataContractSerializer deserializer = new DataContractSerializer(typeof(ObservableCollection<Series>));
-                    Global.Animes = (ObservableCollection<Series>)deserializer.ReadObject(stream);
+                    DataManager.Series = (ObservableCollection<Series>)deserializer.ReadObject(stream);
 
                     _animeHash = ComputeStreamHash((MemoryStream) stream);
                 }
@@ -127,10 +158,10 @@ namespace BangumiArchive
             using (StreamReader reader = new StreamReader(memoryStream))
             {
                 DataContractSerializer serializer = new DataContractSerializer(typeof(ObservableCollection<OtherList>));
-                serializer.WriteObject(memoryStream, Global.OtherLists);
+                serializer.WriteObject(memoryStream, DataManager.OtherLists);
                 memoryStream.Position = 0;
 
-                StorageFile file = await Global.LocalFolder.CreateFileAsync(_otherDataName,
+                StorageFile file = await DataManager.LocalFolder.CreateFileAsync(_otherDataName,
                     CreationCollisionOption.ReplaceExisting);
                 await FileIO.WriteTextAsync(file, reader.ReadToEnd());
 
@@ -145,7 +176,7 @@ namespace BangumiArchive
         {
             try
             {
-                StorageFile file = await Global.LocalFolder.GetFileAsync(_otherDataName);
+                StorageFile file = await DataManager.LocalFolder.GetFileAsync(_otherDataName);
                 string xml = await FileIO.ReadTextAsync(file);
 
                 using (Stream stream = new MemoryStream())
@@ -154,7 +185,7 @@ namespace BangumiArchive
                     stream.Write(data, 0, data.Length);
                     stream.Position = 0;
                     DataContractSerializer deserializer = new DataContractSerializer(typeof(ObservableCollection<OtherList>));
-                    Global.OtherLists = (ObservableCollection<OtherList>)deserializer.ReadObject(stream);
+                    DataManager.OtherLists = (ObservableCollection<OtherList>)deserializer.ReadObject(stream);
 
                     _otherHash = ComputeStreamHash((MemoryStream)stream);
                 }
@@ -169,13 +200,13 @@ namespace BangumiArchive
         /// <summary>
         /// Export anime to user selected location
         /// </summary>
-        public static async void ExportAnime()
+        public static async void ExportSeries()
         {
             FileSavePicker savePicker = new FileSavePicker
             {
                 SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
                 SuggestedFileName = _animeDataName,
-                FileTypeChoices = { {"Data", new List<string>() { ".dat" }} }
+                FileTypeChoices = { {"XML", new List<string>() { ".xml" }} }
             };
 
             var file = await savePicker.PickSaveFileAsync();
@@ -186,12 +217,12 @@ namespace BangumiArchive
             using (StreamReader reader = new StreamReader(memoryStream))
             {
                 DataContractSerializer serializer = new DataContractSerializer(typeof(ObservableCollection<Series>));
-                serializer.WriteObject(memoryStream, Global.Animes);
+                serializer.WriteObject(memoryStream, Series);
                 memoryStream.Position = 0;
 
                 await FileIO.WriteTextAsync(file, reader.ReadToEnd());
 
-                var dialog = new MessageDialog(string.Format("{0} animes successfully exported", Global.Animes.Count), "Export succeeded");
+                var dialog = new MessageDialog(string.Format("{0} series successfully exported", Series.Count), "Export succeeded");
                 await dialog.ShowAsync();
             }
         }
@@ -199,7 +230,7 @@ namespace BangumiArchive
         /// <summary>
         /// Import anime from user selected file
         /// </summary>
-        public static async Task<bool> ImportAnime()
+        public static async Task<bool> ImportSeries()
         {
             // Load the flag of the anime through file picker
             FileOpenPicker openPicker = new FileOpenPicker
@@ -223,11 +254,12 @@ namespace BangumiArchive
                     stream.Write(data, 0, data.Length);
                     stream.Position = 0;
                     DataContractSerializer deserializer = new DataContractSerializer(typeof(ObservableCollection<Series>));
-                    Global.Animes = (ObservableCollection<Series>)deserializer.ReadObject(stream);
+                    Series = (ObservableCollection<Series>)deserializer.ReadObject(stream);
 
-                    var dialog = new MessageDialog(string.Format("{0} animes successfully imported", Global.Animes.Count), "Import succeeded");
+                    var dialog = new MessageDialog(string.Format("{0} animes successfully imported", Series.Count), "Import succeeded");
                     await dialog.ShowAsync();
                 }
+                ResetSeriesIndices();
             }
             catch (Exception e)
             {
@@ -258,12 +290,12 @@ namespace BangumiArchive
             using (StreamReader reader = new StreamReader(memoryStream))
             {
                 DataContractSerializer serializer = new DataContractSerializer(typeof(ObservableCollection<OtherList>));
-                serializer.WriteObject(memoryStream, Global.OtherLists);
+                serializer.WriteObject(memoryStream, DataManager.OtherLists);
                 memoryStream.Position = 0;
 
                 await FileIO.WriteTextAsync(file, reader.ReadToEnd());
 
-                var dialog = new MessageDialog(string.Format("{0} lists successfully exported", Global.OtherLists.Count), "Export succeed");
+                var dialog = new MessageDialog(string.Format("{0} lists successfully exported", DataManager.OtherLists.Count), "Export succeed");
                 await dialog.ShowAsync();
             }
         }
@@ -295,9 +327,9 @@ namespace BangumiArchive
                     stream.Write(data, 0, data.Length);
                     stream.Position = 0;
                     DataContractSerializer deserializer = new DataContractSerializer(typeof(ObservableCollection<OtherList>));
-                    Global.OtherLists = (ObservableCollection<OtherList>)deserializer.ReadObject(stream);
+                    DataManager.OtherLists = (ObservableCollection<OtherList>)deserializer.ReadObject(stream);
 
-                    var dialog = new MessageDialog(string.Format("{0} lists successfully imported", Global.OtherLists.Count), "Import succeed");
+                    var dialog = new MessageDialog(string.Format("{0} lists successfully imported", DataManager.OtherLists.Count), "Import succeed");
                     await dialog.ShowAsync();
                 }
             }
@@ -315,12 +347,12 @@ namespace BangumiArchive
         /// </summary>
         public static void SetCompanyList()
         {
-            Global.CompanyHashSet = new HashSet<string>();
-            foreach (Series a in Global.Animes)
+            DataManager.CompanyHashSet = new HashSet<string>();
+            foreach (Series a in Series)
             {
                 foreach (Season s in a.Seasons)
                 {
-                    Global.CompanyHashSet.Add(s.Company);
+                    CompanyHashSet.Add(s.Company);
                 }
             }
         }
@@ -331,14 +363,23 @@ namespace BangumiArchive
         /// <returns></returns>
         public static bool IsDataChanged()
         {
-            string curAnimeHash = ComputeHash(Global.Animes);
+            string curAnimeHash = ComputeHash(Series);
             if (!_animeHash.Equals(curAnimeHash))
                 return true;
-            string curOtherHash = ComputeHash(Global.OtherLists);
+            string curOtherHash = ComputeHash(OtherLists);
             if (!_otherHash.Equals(curOtherHash))
                 return true;
 
             return false;
+        }
+
+        /// <summary>
+        /// Reset the index list
+        /// </summary>
+        private static void ResetSeriesIndices()
+        {
+            SeriesIndices = new ObservableCollection<SeriesIndex>(
+                Enumerable.Range(0, DataManager.Series.Count).Select(i => new SeriesIndex(i)));
         }
 
         /// <summary>

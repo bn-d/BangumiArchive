@@ -1,12 +1,21 @@
 ﻿<Page
     x:Class="BangumiArchive.UIModule.StatisticsView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:BangumiArchive.UIModule"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="using:BangumiArchive.UIModule"
     mc:Ignorable="d"
     NavigationCacheMode="Enabled">
+
+    <Page.Resources>
+        <DataTemplate x:Key="PairItem" x:DataType="local:Pair">
+            <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
+                <TextBlock Text="{x:Bind Num}" TextAlignment="Right" Margin="0,0,10,0" MinWidth="30"/>
+                <TextBlock Text="{x:Bind Name}" MinWidth="140"/>
+            </StackPanel>
+        </DataTemplate>
+    </Page.Resources>
 
     <Grid>
         <ScrollViewer Background="{x:Null}" BorderBrush="{x:Null}">
@@ -27,27 +36,27 @@
                 </TextBlock>
                 <GridView ItemsSource="{x:Bind reviewRank}" ItemTemplate="{StaticResource PairItem}" SelectionMode="None" 
                           IsItemClickEnabled="True" ItemClick="ReviewItemClick"/>
-                
+
                 <TextBlock Margin="0,50,0,0" FontSize="24">
                     <Run Text="{x:Bind seasonNum}"/>
                     <Run>  seasons/moives created by  </Run>
                     <Run Text="{x:Bind companyNum}"/>
-                    <Run> different animation companies</Run>
+                    <Run> different production companies</Run>
                 </TextBlock>
                 <StackPanel Orientation="Horizontal">
-                    <Button Content="By Season" Click="CompanyBySeason" Margin="20,0,0,0"/>
-                    <Button Content="By Review" Click="CompanyByReview" Margin="20,0,0,0"/>
+                    <Button Content="By Season" Click="CompanyBySeasonClick" Margin="20,0,0,0"/>
+                    <Button Content="By Review" Click="CompanyByReviewClick" Margin="20,0,0,0"/>
                 </StackPanel>
                 <GridView x:Name="CompanyRank" ItemsSource="{x:Bind companyRank}" ItemTemplate="{StaticResource PairItem}" SelectionMode="None"
                           IsItemClickEnabled="True" ItemClick="CompanyItemClick"/>
                 <TextBlock Margin="0,50,0,0" FontSize="24">
                     <Run Text="{x:Bind songNum}"/>
-                    <Run>  anime songs added to the list</Run>
+                    <Run>  OP/ED songs added to the list</Run>
                 </TextBlock>
                 <Button Content="See All" Click="SongClick" Margin="20,0,0,0"/>
             </StackPanel>
         </ScrollViewer>
-        
+
         <AppBarButton Icon="Refresh" Click="RefreshClick" HorizontalAlignment="Right" VerticalContentAlignment="Top" Margin="0,0,20,0"/>
     </Grid>
 </Page>

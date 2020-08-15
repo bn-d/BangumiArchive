@@ -123,11 +123,11 @@
       <DependentUpon>StatisticsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UIModule\UIDictionary.xaml.cs" />
-    <Compile Include="UIModule\AnimeGridView.xaml.cs">
-      <DependentUpon>AnimeGridView.xaml</DependentUpon>
+    <Compile Include="UIModule\MainView.xaml.cs">
+      <DependentUpon>MainView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UIModule\AnimeInfoView.xaml.cs">
-      <DependentUpon>AnimeInfoView.xaml</DependentUpon>
+    <Compile Include="UIModule\DetailView.xaml.cs">
+      <DependentUpon>DetailView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UIModule\InputDialog.xaml.cs">
       <DependentUpon>InputDialog.xaml</DependentUpon>
@@ -171,11 +171,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UIModule\AnimeGridView.xaml">
+    <Page Include="UIModule\MainView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UIModule\AnimeInfoView.xaml">
+    <Page Include="UIModule\DetailView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

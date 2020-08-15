@@ -25,7 +25,8 @@ namespace BangumiArchive
         [DataMember]
         internal ObservableCollection<Series> WatchList;
 
-        public Bangumi(string t) {
+        public Bangumi(string t)
+        {
             Title = t;
         }
     }
@@ -43,23 +44,25 @@ namespace BangumiArchive
         [DataMember]
         internal string SubTitle;
         [DataMember]
-        internal int Rank;
+        private int Rank;
+        internal Review Review { get { return (Review)Rank; } set { Rank = (int)value; } }
         [DataMember]
         internal ObservableCollection<Season> Seasons;
         [DataMember]
         internal ObservableCollection<string> CVs;
         [DataMember]
         internal bool IsWatching;
-        public bool? IsWatchingNullable {
+        public bool? IsWatchingNullable
+        {
             get { return IsWatching; }
-            set { IsWatching = value != null && (bool)value; }
+            set { IsWatching = (bool)value; }
         }
         [DataMember]
         internal bool IsLive;
         public bool? IsLiveNullable
         {
             get { return IsLive; }
-            set { IsLive = value != null && (bool)value; }
+            set { IsLive = (bool)value; }
         }
 
         [DataMember]
@@ -76,12 +79,12 @@ namespace BangumiArchive
         }
         private BitmapImage _flag;
 
-        public Series(int n, string t="")
+        public Series(int n, string t = "")
         {
             Index = n;
             Title = t;
             SubTitle = "";
-            Rank = 5;
+            Review = Review.NoRank;
             Seasons = new ObservableCollection<Season>();
             CVs = new ObservableCollection<string>();
             IsWatchingNullable = false;
@@ -90,28 +93,9 @@ namespace BangumiArchive
             FlagByte = null;
         }
 
-        public bool HasSeason() { return Seasons.Count() > 0; }
+        public bool HasSeason() { return Seasons.Count > 0; }
 
         public override string ToString() { return Title; }
-
-        public static Brush GetRankColorBrush(int value)
-        {
-            switch (value)
-            {
-                case 0:
-                    return new SolidColorBrush(Colors.White);
-                case 1:
-                    return new SolidColorBrush(Color.FromArgb(255, 91, 235, 226));
-                case 2:
-                    return new SolidColorBrush(Color.FromArgb(255, 224, 231, 16));
-                case 3:
-                    return new SolidColorBrush(Color.FromArgb(255, 191, 191, 191));
-                case 4:
-                    return new SolidColorBrush(Color.FromArgb(255, 240, 133, 61));
-                default:
-                    return new SolidColorBrush(Colors.Black);
-            }
-        }
 
         /// <summary>
         /// Convert byte[] to bitmap image
@@ -129,6 +113,19 @@ namespace BangumiArchive
             }
         }
 
+    }
+
+    /// <summary>
+    /// Enum for series review
+    /// </summary>
+    public enum Review
+    {
+        Rank5 = 0,
+        Rank4 = 1,
+        Rank3 = 2,
+        Rank2 = 3,
+        Rank1 = 4,
+        NoRank = 5,
     }
 
     /// <summary>
@@ -184,22 +181,6 @@ namespace BangumiArchive
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
             return ((DateTimeOffset)value).DateTime;
-        }
-    }
-
-    /// <summary>
-    /// Convert rank index to rank color
-    /// </summary>
-    public class RankColorConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, string language)
-        {
-            return Series.GetRankColorBrush((int) value);
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
-        {
-            throw new NotImplementedException();
         }
     }
 

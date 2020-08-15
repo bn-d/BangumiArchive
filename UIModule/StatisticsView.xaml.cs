@@ -8,11 +8,11 @@ using Windows.UI.Xaml.Controls;
 namespace BangumiArchive.UIModule
 {
     /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
+    /// The statistics view
     /// </summary>
     public sealed partial class StatisticsView : Page
     {
-        private int animeNum => Global.Animes.Count;
+        private int animeNum;
         private TimeSpan totalTime;
         private int watchingNum;
 
@@ -21,31 +21,51 @@ namespace BangumiArchive.UIModule
         private ObservableCollection<Pair> reviewRank;
 
         private int seasonNum;
-        private int companyNum => Global.CompanyHashSet.Count;
+        private int companyNum;
         private ObservableCollection<Pair> companyRank;
         private ObservableCollection<Pair> companyReviewRank;
-        private int songNum => SongList.Count;
 
+        private int songNum;
         public static ObservableCollection<string> SongList;
 
         public StatisticsView()
         {
-            RefreshStatistic();
             InitializeComponent();
             DataContextChanged += (s, e) => Bindings.Update();
+
+            RefreshStatistic();
         }
 
         /// <summary>
-        /// Refresh all needed statistics 
+        /// Refresh the statistics view info
         /// </summary>
         private void RefreshStatistic()
         {
-            watchingNum = 0;
-            int totalMin = 0;
+            animeNum = DataManager.SIs.Count;
 
-            reviewNum = 0;
-            int reviewedTotal = 0;
-            reviewRank = new ObservableCollection<Pair>
+            {
+                int totalMin = DataManager.SIs.Sum(cur =>
+                {
+                    int temp = 0;
+                    foreach (Season s in cur.Series.Seasons)
+                    {
+                        temp += (s.Episode + s.Extra) * s.Length * s.Time;
+                    }
+                    return temp;
+                });
+                totalTime = new TimeSpan(0, 0, totalMin, 0);
+            }
+
+            watchingNum = DataManager.SIs.Count(cur => cur.Series.IsWatching);
+
+            reviewNum = DataManager.SIs.Count(cur => cur.Series.Review != Review.NoRank);
+
+            {
+                int reviewedTotal = DataManager.SIs.Sum(cur => 5 - (int)cur.Series.Review);
+                reviewAvg = (float)reviewedTotal / reviewNum;
+            }
+
+            reviewRank = DataManager.SIs.Aggregate(new ObservableCollection<Pair>
             {
                 new Pair("Rank 5", 0),
                 new Pair("Rank 4", 0),
@@ -53,96 +73,112 @@ namespace BangumiArchive.UIModule
                 new Pair("Rank 2", 0),
                 new Pair("Rank 1", 0),
                 new Pair("No Rank", 0),
-            };
-            seasonNum = 0;
-
-            Dictionary<string, int> companyDict = new Dictionary<string, int>();
-            Dictionary<string, int> companyReviewDict = new Dictionary<string, int>();
-
-            SongList = new ObservableCollection<string>();
-
-            foreach (Series a in Global.Animes)
+            }, (acc, cur) =>
             {
-                if (UIDictionary.NullBToBool(a.IsWatchingNullable))
-                    watchingNum += 1;
+                acc[(int)cur.Series.Review].Num += 1;
+                return acc;
+            });
 
-                reviewRank[a.Rank].Num += 1;
-                if (a.Rank != 5)
+            seasonNum = DataManager.SIs.Aggregate(0, (acc, cur) => acc + cur.Series.Seasons.Count);
+
+            // Count company related statistics
+            {
+                Dictionary<string, int> companyDict = DataManager.SIs.Aggregate(new Dictionary<string, int>(),
+                    (acc, cur) =>
+                    {
+                        foreach (Season s in cur.Series.Seasons)
+                        {
+                            if (!acc.ContainsKey(s.Company))
+                            { acc[s.Company] = 0; }
+
+                            acc[s.Company] += 1;
+                        }
+                        return acc;
+                    });
+                var companys = companyDict.Keys;
+                companyRank = companys.Aggregate(new ObservableCollection<Pair>(), (acc, cur) =>
                 {
-                    reviewNum += 1;
-                    reviewedTotal += 5 - a.Rank;
-                }
+                    if (companyDict[cur] >= 4)
+                    {
+                        acc.Add(new Pair(cur, companyDict[cur]));
+                    }
+                    return acc;
+                });
+                companyRank = new ObservableCollection<Pair>(companyRank.OrderByDescending(i => i.Num));
 
-                // Count info for each season
-                foreach (Season s in a.Seasons)
+                companyNum = companys.Count;
+
+                Dictionary<string, int> companyReviewDict = DataManager.SIs.Aggregate(new Dictionary<string, int>(),
+                    (acc, cur) =>
+                    {
+                        foreach (Season s in cur.Series.Seasons)
+                        {
+                            if (!acc.ContainsKey(s.Company))
+                                acc[s.Company] = 0;
+
+                            acc[s.Company] += 5 - (int)cur.Series.Review;
+                        }
+                        return acc;
+                    });
+                companyReviewRank = companys.Aggregate(new ObservableCollection<Pair>(), (acc, cur) =>
                 {
-                    totalMin += (s.Episode + s.Extra) * s.Length * s.Time;
-
-                    seasonNum += 1;
-                    if (!companyDict.ContainsKey(s.Company))
-                        companyDict[s.Company] = 0;
-
-                    companyDict[s.Company] += 1;
-
-
-                    if (!companyReviewDict.ContainsKey(s.Company))
-                        companyReviewDict[s.Company] = 0;
-
-                    companyReviewDict[s.Company] += 5 - a.Rank;
-
-                    foreach (Song ss in s.Songs)
-                        SongList.Add(string.Format("{0}    -    {1}", a.Title, ss.Name));
-                }
+                    if (companyDict[cur] >= 4)
+                    {
+                        float avg = (float)(int)((float)companyReviewDict[cur] / companyDict[cur] * 100) / 100;
+                        acc.Add(new Pair(cur, avg));
+                    }
+                    return acc;
+                });
+                companyReviewRank = new ObservableCollection<Pair>(companyReviewRank.OrderByDescending(i => i.Num));
             }
 
-            totalTime = new TimeSpan(0, 0, totalMin, 0);
-
-            reviewAvg = (float) reviewedTotal / reviewNum;
-
-            var companys = companyDict.Keys;
-
-            companyRank = new ObservableCollection<Pair>();
-            companyReviewRank = new ObservableCollection<Pair>();
-            foreach (string c in companys)
-            {
-                if (companyDict[c] >= 4)
+            // Count song related statistics
+            SongList = DataManager.SIs.Aggregate(new ObservableCollection<string>(),
+                (acc, cur) =>
                 {
-                    companyRank.Add(new Pair(c, companyDict[c]));
-                    float avg = (float) (int) ((float) companyReviewDict[c] / companyDict[c] * 100) / 100;
-                    companyReviewRank.Add(new Pair(c, avg));
-                }
-            }
-            companyRank = new ObservableCollection<Pair>(companyRank.OrderByDescending(i => i.Num));
-            companyReviewRank = new ObservableCollection<Pair>(companyReviewRank.OrderByDescending(i => i.Num));
-        }
+                    foreach (Season s in cur.Series.Seasons)
+                    {
+                        foreach (Song ss in s.Songs)
+                            acc.Add(string.Format("{0}    -    {1}", cur.Series.Title, ss.Name));
+                    }
+                    return acc;
+                });
 
-        /// <summary>
-        /// Refresh the view
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void RefreshClick(object sender, RoutedEventArgs e)
-        {
-            RefreshStatistic();
+            songNum = SongList.Count;
+
             Bindings.Update();
         }
 
         /// <summary>
-        /// Navigate to song page
+        /// Refresh the statistics view
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void SongClick(object sender, RoutedEventArgs e)
-        {
-            Frame.Navigate(typeof(SongView));
-        }
+        private void RefreshClick(object sender, RoutedEventArgs e) => RefreshStatistic();
 
-        private void CompanyBySeason(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Navigate to the song page
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SongClick(object sender, RoutedEventArgs e) => Frame.Navigate(typeof(SongView));
+
+        /// <summary>
+        /// Sort companies by number of seasons watched
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CompanyBySeasonClick(object sender, RoutedEventArgs e)
         {
             CompanyRank.ItemsSource = companyRank;
         }
 
-        private void CompanyByReview(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Sort companies by average review score
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CompanyByReviewClick(object sender, RoutedEventArgs e)
         {
             CompanyRank.ItemsSource = companyReviewRank;
         }
@@ -154,28 +190,16 @@ namespace BangumiArchive.UIModule
         /// <param name="e"></param>
         private void ReviewItemClick(object sender, ItemClickEventArgs e)
         {
-            Pair p = (Pair)e.ClickedItem;
-            int rank;
-            switch (p.Name)
+            MainView.ReviewFilter = ((Pair)e.ClickedItem).Name switch
             {
-                case "Rank 5": rank = 0; break;
-                case "Rank 4": rank = 1; break;
-                case "Rank 3": rank = 2; break;
-                case "Rank 2": rank = 3; break;
-                case "Rank 1": rank = 4; break;
-                default:       rank = 5; break;
-            }
-
-            Global.FilteredAnimes = new ObservableCollection<Series>();
-
-            foreach (Series a in Global.Animes)
-            {
-                if (a.Rank == rank)
-                    Global.FilteredAnimes.Add(a);
-            }
-            Global.IsFiltered = true;
-            AnimeGridView.UpdateGrid();
-            MainPage.NavigateAnimeGridView();
+                "Rank 5" => Review.Rank5,
+                "Rank 4" => Review.Rank4,
+                "Rank 3" => Review.Rank3,
+                "Rank 2" => Review.Rank2,
+                "Rank 1" => Review.Rank1,
+                _ => Review.NoRank,
+            };
+            MainPage.NavigateMainView();
         }
 
         /// <summary>
@@ -185,36 +209,18 @@ namespace BangumiArchive.UIModule
         /// <param name="e"></param>
         private void CompanyItemClick(object sender, ItemClickEventArgs e)
         {
-            Pair p = (Pair) e.ClickedItem;
-            Global.FilteredAnimes = new ObservableCollection<Series>();
-
-            foreach (Series a in Global.Animes)
-            {
-                bool company = false;
-                foreach (Season s in a.Seasons)
-                {
-                    if (s.Company == p.Name)
-                    {
-                        company = true;
-                        break;
-                    }
-                }
-                if (company)
-                    Global.FilteredAnimes.Add(a);
-            }
-            Global.IsFiltered = true;
-            AnimeGridView.UpdateGrid();
-            MainPage.NavigateAnimeGridView();
+            MainView.CompanyFilter = ((Pair)e.ClickedItem).Name;
+            MainPage.NavigateMainView();
         }
     }
 
     /// <summary>
-    /// A simple pair class
+    /// A simple string, float pair
     /// </summary>
     public class Pair
     {
-        public float Num;
         public string Name;
+        public float Num;
 
         public Pair(string name, float num)
         {

@@ -13,7 +13,7 @@ namespace BangumiArchive.UIModule
     /// </summary>
     public sealed partial class OtherView : Page
     {
-        public ObservableCollection<OtherList> OtherLists => Global.OtherLists;
+        public ObservableCollection<OtherList> OtherLists => DataManager.OtherLists;
 
         public OtherView()
         {
@@ -47,7 +47,7 @@ namespace BangumiArchive.UIModule
             if (imported)
             {
                 OtherListView.ItemsSource = null;
-                OtherListView.ItemsSource = Global.OtherLists;
+                OtherListView.ItemsSource = DataManager.OtherLists;
             }
         }
 

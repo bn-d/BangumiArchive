@@ -1,0 +1,185 @@
+﻿<Page
+    x:Class="BangumiArchive.UIModule.DetailView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:global="using:BangumiArchive"
+    mc:Ignorable="d"
+    RequestedTheme="Dark">
+
+    <Page.Resources>
+        <DataTemplate x:Key="SeasonItem" x:DataType="global:Season">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBox Text="{x:Bind SeasonTitle, Mode=TwoWay}" 
+                             Style="{StaticResource TBStyle}"
+                             FontSize="24" PlaceholderText="Season Name"
+                             MinWidth="300" LostFocus="TrimText" TextWrapping="Wrap"/>
+                    <TextBlock Text="By "
+                               Style="{StaticResource TBTextStyle}"
+                               Margin="10,0,0,7"/>
+                    <AutoSuggestBox x:Name="CompanyTB"
+                                    Text="{x:Bind Company, Mode=TwoWay}"
+                                    Style="{StaticResource TBSuggestStyle}"
+                                    PlaceholderText="Company" MinWidth="150"
+                                    LostFocus="TrimTextSuggest" 
+                                    TextChanged="CompanyTextChanged"/>
+                    <CalendarDatePicker Date="{x:Bind Date, Mode=TwoWay, Converter={StaticResource TimeConverter}}" 
+                                        Background="{x:Null}" BorderBrush="{x:Null}" 
+                                        Foreground="White" VerticalAlignment="Bottom" 
+                                        PlaceholderText="Date" 
+                                        DateFormat="{}{month.abbreviated} {day.integer}, {year.full}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBox Text="{x:Bind Episode, Mode=TwoWay}"
+                         Style="{StaticResource TBStyle}"
+                         KeyDown="OnlyDigitKeyDown"
+                         TextAlignment="Right" Margin="50,0,0,0"/>
+                    <TextBlock Text=" Episodes + "
+                               Style="{StaticResource TBTextStyle}"/>
+                    <TextBox Text="{x:Bind Extra, Mode=TwoWay}" 
+                         Style="{StaticResource TBStyle}"
+                         KeyDown="OnlyDigitKeyDown"
+                         TextAlignment="Right" MinWidth="32"/>
+                    <TextBlock Text=" Extra"
+                               Style="{StaticResource TBTextStyle}"/>
+                    <TextBox Text="{x:Bind Length, Mode=TwoWay}"
+                         Style="{StaticResource TBStyle}"
+                         KeyDown="OnlyDigitKeyDown"
+                         TextAlignment="Right" Margin="50,0,0,0"/>
+                    <TextBlock Text=" Mins per Episodes x "
+                               Style="{StaticResource TBTextStyle}"/>
+                    <TextBox Text="{x:Bind Time, Mode=TwoWay}"
+                         Style="{StaticResource TBStyle}"
+                         KeyDown="OnlyDigitKeyDown"
+                         TextAlignment="Right"  MinWidth="32"/>
+                    <TextBlock Text=" Times"
+                           Style="{StaticResource TBTextStyle}"/>
+                    <Button Content="Song"
+                        Background="{x:Null}" BorderBrush="{x:Null}"
+                        VerticalAlignment="Bottom" HorizontalAlignment="Left" 
+                        VerticalContentAlignment="Bottom" HorizontalContentAlignment="Left" 
+                        FontSize="18" Margin="50,0,0,0">
+                        <Button.Flyout>
+                            <Flyout Placement="Bottom">
+                                <Flyout.FlyoutPresenterStyle>
+                                    <Style TargetType="FlyoutPresenter">
+                                        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+                                        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled"/>
+                                    </Style>
+                                </Flyout.FlyoutPresenterStyle>
+                                <StackPanel ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                                    <ListView ItemsSource="{x:Bind Songs}">
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate x:DataType="global:Song">
+                                                <TextBox Text="{x:Bind Name, Mode=TwoWay}"
+                                                     Style="{StaticResource TBStyle}"
+                                                     HorizontalContentAlignment="Stretch"
+                                                     LostFocus="TrimText" MinWidth="200"/>
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
+                                    <StackPanel Orientation="Horizontal">
+                                        <AppBarButton Icon="Add" Label="Add" Click="AddSongClick" IsCompact="True"
+                                                  VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                        <AppBarButton Icon="Remove" Label="Remove" Click="RemoveSongClick" IsCompact="True"
+                                                  VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled" VerticalAlignment="Stretch">
+        <ScrollViewer Background="{x:Null}" BorderBrush="{x:Null}">
+            <StackPanel x:Name="AnimeInfoList" Margin="0,50,0,0" >
+                <StackPanel Orientation="Horizontal" 
+                            HorizontalAlignment="Center" Margin="0,0,0,20">
+                    <Button x:Name="AnimeFlag" Click="ChangeFlagClick" Height="40" Width="40">
+                        <Button.Background>
+                            <ImageBrush Stretch="Uniform" ImageSource="{x:Bind Series.Flag}"/>
+                        </Button.Background>
+                    </Button>
+                    <Button Content="{x:Bind Index.IndexString}"  
+                            FontSize="36"
+                            HorizontalAlignment="Right" VerticalAlignment="Center"
+                            MinWidth="50" Background="{x:Null}" BorderBrush="{x:Null}">
+                        <Button.Flyout>
+                            <MenuFlyout Placement="Bottom">
+                                <MenuFlyoutItem Text="5" Background="White" Foreground="White" Click="ChangeRankClick"/>
+                                <MenuFlyoutItem Text="4" Background="#FF5BEBE2" Foreground="#FF5BEBE2" Click="ChangeRankClick"/>
+                                <MenuFlyoutItem Text="3" Background="#FFE0E710" Foreground="#FFE0E710" Click="ChangeRankClick"/>
+                                <MenuFlyoutItem Text="2" Background="#FFBFBFBF" Foreground="#FFBFBFBF" Click="ChangeRankClick"/>
+                                <MenuFlyoutItem Text="1" Background="#FFF0853D" Foreground="#FFF0853D" Click="ChangeRankClick"/>
+                                <MenuFlyoutItem Text="0" Background="Black" Foreground="Black"/>
+                            </MenuFlyout>
+                        </Button.Flyout>
+                    </Button>
+                    <Rectangle x:Name="RankBar" 
+                           Width="5" Margin="0,20" VerticalAlignment="Stretch" Fill="{x:Bind Series.Review, Converter={StaticResource RankColorConverter}}"/>
+                    <StackPanel>
+                        <TextBox x:Name="TitleTB"
+                                 Text="{x:Bind Series.Title, Mode=TwoWay}" 
+                                 Style="{StaticResource TBStyle}" 
+                                 FontSize="36" MinWidth="500" 
+                                 PlaceholderText="Series Title"
+                                 LostFocus="TrimText"/>
+                        <Rectangle Height="3" Fill="White"/>
+                        <TextBox x:Name="SubTitleTB"
+                                 Text="{x:Bind Series.SubTitle, Mode=TwoWay}" 
+                                 Style="{StaticResource TBStyle}" 
+                                 MinWidth="500"
+                                 LostFocus="TrimText"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" 
+                            VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,0,0,20">
+                    <CheckBox IsChecked="{x:Bind Series.IsWatchingNullable, Mode=TwoWay}"
+                              Content="Watching" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                    <CheckBox IsChecked="{x:Bind Series.IsLiveNullable, Mode=TwoWay}"
+                              Content="Live" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                </StackPanel>
+
+                <ListView x:Name="SeasonList" 
+                          ItemsSource="{x:Bind Series.Seasons}" ItemTemplate="{StaticResource SeasonItem}"
+                          Margin="100,0" HorizontalAlignment="Center" SelectionMode="None"/>
+            </StackPanel>
+        </ScrollViewer>
+
+        <CommandBar Background="{x:Null}" Margin="0,0,20,0" OverflowButtonVisibility="Collapsed">
+            <CommandBar.Content>
+                <StackPanel Orientation="Horizontal">
+                    <AppBarButton Icon="Back" Label="" Click="BackClick" VerticalAlignment="Bottom"/>
+                    <AutoSuggestBox x:Name="AnimeSearchBox" QueryIcon="Find"
+                                    Margin="0,5,0,0"
+                                    PlaceholderText="Search" FontSize="18"
+                                    Width="300" VerticalAlignment="Top"
+                                    TextChanged="SearchTextChanged" QuerySubmitted="SearchQuerySubmitted"/>
+                </StackPanel>
+            </CommandBar.Content>
+
+            <AppBarButton Icon="Add" Label="" Click="AddSeasonClick"/>
+            <AppBarButton Icon="Remove" Label="" Click="RemoveSeasonClick"/>
+            <AppBarButton Icon="Save" Label="" Click="SaveClick"/>
+        </CommandBar>
+
+        <AppBarButton Click="PreviousSeriesClick"
+                      VerticalAlignment="Center" HorizontalAlignment="Left">
+            <AppBarButton.Icon>
+                <FontIcon Glyph="&#59243;"/>
+            </AppBarButton.Icon>
+        </AppBarButton>
+        <AppBarButton Click="NextSeriesAsyncClick"
+                      VerticalAlignment="Center" HorizontalAlignment="Right">
+            <AppBarButton.Icon>
+                <FontIcon Glyph="&#59244;"/>
+            </AppBarButton.Icon>
+        </AppBarButton>
+    </Grid>
+</Page>

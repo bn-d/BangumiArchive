@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Windows.ApplicationModel.Appointments;
-using Windows.ApplicationModel.VoiceCommands;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Microsoft.Toolkit.Uwp;
 
 namespace BangumiArchive.UIModule
 {
     /// <summary>
-    /// Show the schedule of currently watching series
+    /// The weekly schedule view 
     /// </summary>
     public sealed partial class ScheduleView : Page
     {
@@ -25,47 +21,56 @@ namespace BangumiArchive.UIModule
             DataContextChanged += (s, e) => Bindings.Update();
         }
 
+        /// <summary>
+        /// Update the schedule info
+        /// </summary>
         private void RefreshWeeklyView()
         {
             weekList.Clear();
 
-            int index = 0;
-            foreach (Series s in Global.Animes)
+            foreach (SeriesIndex i in DataManager.SeriesIndices)
             {
-                if (s.IsWatching && s.HasSeason())
+                if (i.Series.IsWatching && i.Series.HasSeason())
                 {
-                    weekList.AddSeries(s.Seasons.Last().Date.DayOfWeek, index);
+                    weekList.AddSeries(i.Series.Seasons.Last().Date.DayOfWeek, i);
                 }
-                ++index;
             }
         }
 
+        /// <summary>
+        /// Refresh the schedule view
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void RefreshClick(object sender, RoutedEventArgs e)
         {
             RefreshWeeklyView();
             Bindings.Update();
         }
 
+        /// <summary>
+        /// Navigate to corresponding series detail page 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SeriesItemClick(object sender, ItemClickEventArgs e)
         {
-            MainPage.ShowAnimeDetail((int)e.ClickedItem);
-            MainPage.NavigateAnimeGridView();
+            MainPage.NavigateDetailView((SeriesIndex)e.ClickedItem);
         }
-
     }
 
     public class DayList
     {
         public DayOfWeek DayOfWeek { get; }
-        public ObservableCollection<int> Series { get; }
+        public ObservableCollection<SeriesIndex> Series { get; }
 
         public DayList(DayOfWeek dow)
         {
             DayOfWeek = dow;
-            Series = new ObservableCollection<int>();
+            Series = new ObservableCollection<SeriesIndex>();
         }
 
-        public void AddSeries(int i) { Series.Add(i); }
+        public void AddSeries(SeriesIndex i) { Series.Add(i); }
 
         public void Clear() { Series.Clear(); }
     }
@@ -73,7 +78,6 @@ namespace BangumiArchive.UIModule
     public class WeekList
     {
         public ObservableCollection<DayList> Days { get; }
-        public DayList Monday;
 
         public WeekList()
         {
@@ -82,10 +86,9 @@ namespace BangumiArchive.UIModule
             {
                 Days.Add(new DayList((DayOfWeek)i));
             }
-            Monday = new DayList(0);
         }
 
-        public void AddSeries(DayOfWeek dow, int index)
+        public void AddSeries(DayOfWeek dow, SeriesIndex index)
         {
             Days[(int)dow].AddSeries(index);
         }

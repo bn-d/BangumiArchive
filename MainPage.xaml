@@ -69,7 +69,7 @@
                         </Grid.Background>
                     </Grid>
 
-                    <Frame x:Name="OtherFrame" Grid.Row="1">
+                    <Frame x:Name="OtherFrame" Grid.Row="1" VerticalContentAlignment="Stretch">
                         <Frame.Background>
                             <ImageBrush Stretch="UniformToFill" ImageSource="Assets/background.png"/>
                         </Frame.Background>
