@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -35,8 +36,10 @@ namespace BangumiArchive
     /// Anime class that contains the index, name and other information of an anime 
     /// </summary>
     [DataContract]
-    public class Series
+    public class Series : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         [DataMember]
         internal int Index;
         [DataMember]
@@ -45,7 +48,14 @@ namespace BangumiArchive
         internal string SubTitle;
         [DataMember]
         private int Rank;
-        internal Review Review { get { return (Review)Rank; } set { Rank = (int)value; } }
+        internal Review Review { 
+            get { return (Review)Rank; } 
+            set 
+            { 
+                Rank = (int)value;
+                OnPropertyChanged("Review");
+            } 
+        }
         [DataMember]
         internal ObservableCollection<Season> Seasons;
         [DataMember]
@@ -111,6 +121,11 @@ namespace BangumiArchive
                 stream.Seek(0);
                 await _flag.SetSourceAsync(stream);
             }
+        }
+
+        internal void OnPropertyChanged(string name)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
     }

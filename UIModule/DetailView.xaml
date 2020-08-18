@@ -6,9 +6,74 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:global="using:BangumiArchive"
     mc:Ignorable="d"
-    RequestedTheme="Dark">
+    RequestedTheme="Dark"
+    NavigationCacheMode="Enabled">
 
     <Page.Resources>
+        <DataTemplate x:Key="SeriesItem" x:DataType="global:SeriesIndex">
+            <Grid Margin="0,50,0,0" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <StackPanel Orientation="Horizontal" 
+                            HorizontalAlignment="Center" Margin="0,0,0,20">
+                    <Button x:Name="AnimeFlag" Click="ChangeFlagClick" Height="40" Width="40">
+                        <Button.Background>
+                            <ImageBrush Stretch="Uniform" ImageSource="{x:Bind Series.Flag, Mode=OneWay}"/>
+                        </Button.Background>
+                    </Button>
+                    <Button Content="{x:Bind IndexString}"  
+                            FontSize="36"
+                            HorizontalAlignment="Right" VerticalAlignment="Center"
+                            MinWidth="50" Background="{x:Null}" BorderBrush="{x:Null}">
+                        <Button.Flyout>
+                            <MenuFlyout Placement="Bottom">
+                                <MenuFlyoutItem Text="5" Background="White" Foreground="White" Click="ChangeRankClick"/>
+                                <MenuFlyoutItem Text="4" Background="#FF5BEBE2" Foreground="#FF5BEBE2" Click="ChangeRankClick"/>
+                                <MenuFlyoutItem Text="3" Background="#FFE0E710" Foreground="#FFE0E710" Click="ChangeRankClick"/>
+                                <MenuFlyoutItem Text="2" Background="#FFBFBFBF" Foreground="#FFBFBFBF" Click="ChangeRankClick"/>
+                                <MenuFlyoutItem Text="1" Background="#FFF0853D" Foreground="#FFF0853D" Click="ChangeRankClick"/>
+                                <MenuFlyoutItem Text="0" Background="Black" Foreground="Black" Click="ChangeRankClick"/>
+                            </MenuFlyout>
+                        </Button.Flyout>
+                    </Button>
+                    <Rectangle x:Name="RankBar" 
+                           Width="5" Margin="0,20" VerticalAlignment="Stretch" Fill="{x:Bind Series.Review, Mode=OneWay, Converter={StaticResource RankColorConverter}}"/>
+                    <StackPanel>
+                        <TextBox x:Name="TitleTB"
+                                 Text="{x:Bind Series.Title, Mode=TwoWay}" 
+                                 Style="{StaticResource TBStyle}" 
+                                 FontSize="36" MinWidth="500" 
+                                 PlaceholderText="Series Title"
+                                 LostFocus="TrimText"/>
+                        <Rectangle Height="3" Fill="White"/>
+                        <TextBox x:Name="SubTitleTB"
+                                 Text="{x:Bind Series.SubTitle, Mode=TwoWay}" 
+                                 Style="{StaticResource TBStyle}" 
+                                 MinWidth="500"
+                                 LostFocus="TrimText"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" 
+                            VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,0,0,20" Grid.Row="1">
+                    <CheckBox IsChecked="{x:Bind Series.IsWatchingNullable, Mode=TwoWay}"
+                              Content="Watching" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                    <CheckBox IsChecked="{x:Bind Series.IsLiveNullable, Mode=TwoWay}"
+                              Content="Live" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                </StackPanel>
+
+                <ScrollViewer HorizontalAlignment="Center" 
+                              VerticalAlignment="Stretch" Grid.Row="2">
+                    <ListView x:Name="SeasonList" 
+                              ItemsSource="{x:Bind Series.Seasons}" ItemTemplate="{StaticResource SeasonItem}"
+                              Margin="100,0" HorizontalAlignment="Center" SelectionMode="None"/>
+                </ScrollViewer>
+            </Grid>
+        </DataTemplate>
+        
         <DataTemplate x:Key="SeasonItem" x:DataType="global:Season">
             <StackPanel>
                 <StackPanel Orientation="Horizontal">
@@ -96,61 +161,11 @@
     </Page.Resources>
 
     <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled" VerticalAlignment="Stretch">
-        <ScrollViewer Background="{x:Null}" BorderBrush="{x:Null}">
-            <StackPanel x:Name="AnimeInfoList" Margin="0,50,0,0" >
-                <StackPanel Orientation="Horizontal" 
-                            HorizontalAlignment="Center" Margin="0,0,0,20">
-                    <Button x:Name="AnimeFlag" Click="ChangeFlagClick" Height="40" Width="40">
-                        <Button.Background>
-                            <ImageBrush Stretch="Uniform" ImageSource="{x:Bind Series.Flag}"/>
-                        </Button.Background>
-                    </Button>
-                    <Button Content="{x:Bind Index.IndexString}"  
-                            FontSize="36"
-                            HorizontalAlignment="Right" VerticalAlignment="Center"
-                            MinWidth="50" Background="{x:Null}" BorderBrush="{x:Null}">
-                        <Button.Flyout>
-                            <MenuFlyout Placement="Bottom">
-                                <MenuFlyoutItem Text="5" Background="White" Foreground="White" Click="ChangeRankClick"/>
-                                <MenuFlyoutItem Text="4" Background="#FF5BEBE2" Foreground="#FF5BEBE2" Click="ChangeRankClick"/>
-                                <MenuFlyoutItem Text="3" Background="#FFE0E710" Foreground="#FFE0E710" Click="ChangeRankClick"/>
-                                <MenuFlyoutItem Text="2" Background="#FFBFBFBF" Foreground="#FFBFBFBF" Click="ChangeRankClick"/>
-                                <MenuFlyoutItem Text="1" Background="#FFF0853D" Foreground="#FFF0853D" Click="ChangeRankClick"/>
-                                <MenuFlyoutItem Text="0" Background="Black" Foreground="Black"/>
-                            </MenuFlyout>
-                        </Button.Flyout>
-                    </Button>
-                    <Rectangle x:Name="RankBar" 
-                           Width="5" Margin="0,20" VerticalAlignment="Stretch" Fill="{x:Bind Series.Review, Converter={StaticResource RankColorConverter}}"/>
-                    <StackPanel>
-                        <TextBox x:Name="TitleTB"
-                                 Text="{x:Bind Series.Title, Mode=TwoWay}" 
-                                 Style="{StaticResource TBStyle}" 
-                                 FontSize="36" MinWidth="500" 
-                                 PlaceholderText="Series Title"
-                                 LostFocus="TrimText"/>
-                        <Rectangle Height="3" Fill="White"/>
-                        <TextBox x:Name="SubTitleTB"
-                                 Text="{x:Bind Series.SubTitle, Mode=TwoWay}" 
-                                 Style="{StaticResource TBStyle}" 
-                                 MinWidth="500"
-                                 LostFocus="TrimText"/>
-                    </StackPanel>
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal" 
-                            VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,0,0,20">
-                    <CheckBox IsChecked="{x:Bind Series.IsWatchingNullable, Mode=TwoWay}"
-                              Content="Watching" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-                    <CheckBox IsChecked="{x:Bind Series.IsLiveNullable, Mode=TwoWay}"
-                              Content="Live" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-                </StackPanel>
-
-                <ListView x:Name="SeasonList" 
-                          ItemsSource="{x:Bind Series.Seasons}" ItemTemplate="{StaticResource SeasonItem}"
-                          Margin="100,0" HorizontalAlignment="Center" SelectionMode="None"/>
-            </StackPanel>
-        </ScrollViewer>
+        <FlipView x:Name="SeriesDetail"
+                  Background="{x:Null}"
+                  VerticalContentAlignment="Top"
+                  ItemsSource="{x:Bind IndexList}"
+                  ItemTemplate="{StaticResource SeriesItem}"/>
 
         <CommandBar Background="{x:Null}" Margin="0,0,20,0" OverflowButtonVisibility="Collapsed">
             <CommandBar.Content>
@@ -168,18 +183,5 @@
             <AppBarButton Icon="Remove" Label="" Click="RemoveSeasonClick"/>
             <AppBarButton Icon="Save" Label="" Click="SaveClick"/>
         </CommandBar>
-
-        <AppBarButton Click="PreviousSeriesClick"
-                      VerticalAlignment="Center" HorizontalAlignment="Left">
-            <AppBarButton.Icon>
-                <FontIcon Glyph="&#59243;"/>
-            </AppBarButton.Icon>
-        </AppBarButton>
-        <AppBarButton Click="NextSeriesAsyncClick"
-                      VerticalAlignment="Center" HorizontalAlignment="Right">
-            <AppBarButton.Icon>
-                <FontIcon Glyph="&#59244;"/>
-            </AppBarButton.Icon>
-        </AppBarButton>
     </Grid>
 </Page>

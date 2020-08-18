@@ -10,7 +10,6 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-
 namespace BangumiArchive.UIModule
 {
     /// <summary>
@@ -18,7 +17,8 @@ namespace BangumiArchive.UIModule
     /// </summary>
     public sealed partial class DetailView : Page
     {
-        private SeriesIndex Index;
+        private ObservableCollection<SeriesIndex> IndexList => DataManager.SeriesIndices;
+        private SeriesIndex Index => IndexList[SeriesDetail.SelectedIndex];
         private Series Series => Index.Series;
 
         public DetailView()
@@ -33,7 +33,7 @@ namespace BangumiArchive.UIModule
         /// <param name="e"></param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            Index = (SeriesIndex)e.Parameter;
+            SeriesDetail.SelectedIndex = ((SeriesIndex)e.Parameter).Index;
         }
 
         /// <summary>
@@ -56,7 +56,6 @@ namespace BangumiArchive.UIModule
             if (Series.Seasons.Any())
                 Series.Seasons.RemoveAt(Series.Seasons.Count - 1);
         }
-
 
         /// <summary>
         /// Add a new song
@@ -95,7 +94,6 @@ namespace BangumiArchive.UIModule
         private void ChangeRankClick(object sender, RoutedEventArgs e)
         {
             Series.Review = (Review)(5 - int.Parse(((MenuFlyoutItem)sender).Text));
-            Bindings.Update();
         }
 
         /// <summary>
@@ -123,50 +121,7 @@ namespace BangumiArchive.UIModule
             Series.FlagByte = new byte[stream.Size];
             reader.ReadBytes(Series.FlagByte);
 
-            Bindings.Update();
-        }
-
-        /// <summary>
-        /// Navigate to previous Series
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void PreviousSeriesClick(object sender, RoutedEventArgs e)
-        {
-            if (Index.HasPrev())
-                MainPage.NavigateDetailView(Index.Prev());
-        }
-
-        /// <summary>
-        /// Navigate to next Series
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private async void NextSeriesAsyncClick(object sender, RoutedEventArgs e)
-        {
-            if (Index.HasNext())
-            {
-                MainPage.NavigateDetailView(Index.Next());
-            }
-            else
-            {
-                // Show input dialog to get the new Series name
-                var dialog = new InputDialog();
-                var result = await dialog.ShowAsync();
-
-                if (result != ContentDialogResult.Primary) return;
-
-                // Create new Series
-                string name = dialog.Text;
-                SeriesIndex si = DataManager.AddSeries(name);
-                if (!MainView.IsFiltered)
-                {
-                    MainView.StaticIndexList.Add(si);
-                }
-
-                // Display the Series' details
-                MainPage.NavigateDetailView(si);
-            }
+            Series.OnPropertyChanged("Flag");
         }
 
         private void BackClick(object sender, RoutedEventArgs e) => 

@@ -30,11 +30,6 @@ namespace BangumiArchive
         public Series Series => DataManager.Series[Index];
         public Series S => Series;
 
-        public bool HasNext() => Index < DataManager.SIs.Count - 1;
-        public SeriesIndex Next() => DataManager.SIs[Math.Min(Index + 1, DataManager.SIs.Count - 1)];
-        public bool HasPrev() => Index > 0;
-        public SeriesIndex Prev() => DataManager.SIs[Math.Max(Index - 1, 0)];
-
         public override string ToString() { return Series.Title; }
     }
 
