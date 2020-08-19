@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using System.Collections.ObjectModel;
 using Windows.UI.Xaml.Navigation;
-using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
 
 namespace BangumiArchive.UIModule
 {
@@ -15,28 +12,21 @@ namespace BangumiArchive.UIModule
     /// </summary>
     public sealed partial class MainView : Page
     {
-        public static bool IsFiltered;
+        public static bool IsFiltered = false;
         public static string CompanyFilter = "";
         public static Review? ReviewFilter;
         public static ObservableCollection<SeriesIndex> StaticIndexList;
 
-        public ObservableCollection<SeriesIndex> IndexList => StaticIndexList;
-        public List<CheckBox> ReviewCBs;
+        private ObservableCollection<SeriesIndex> IndexList => StaticIndexList;
+        private ObservableCollection<ReviewBoolPair> ReviewChecked;
 
         public MainView()
         {
             InitializeComponent();
             DataContextChanged += (s, e) => Bindings.Update();
 
-            ReviewCBs = new List<CheckBox>();
-            ReviewCBs.Add(Rank5CB);
-            ReviewCBs.Add(Rank4CB);
-            ReviewCBs.Add(Rank3CB);
-            ReviewCBs.Add(Rank2CB);
-            ReviewCBs.Add(Rank1CB);
-            ReviewCBs.Add(NoRankCB);
-
-            IsFiltered = false;
+            ReviewChecked = new ObservableCollection<ReviewBoolPair>
+                (ReviewHelper.All.Select(cur => new ReviewBoolPair(cur, true)).ToList());
 
             ResetIndexList();
         }
@@ -60,13 +50,12 @@ namespace BangumiArchive.UIModule
 
                 if (ReviewFilter != null)
                 {
-                    ReviewCBs.ForEach(cur => cur.IsChecked = false);
-                    ReviewCBs[(int)(Review)ReviewFilter].IsChecked = true;
+                    foreach (ReviewBoolPair r in ReviewChecked) r.Second = false;
+                    ReviewChecked[(int)(Review)ReviewFilter].Second = true;
                     ReviewFilter = null;
                 }
                 FilterSeries();
             }
-            //Bindings.Update();
         }
 
         /// <summary>
@@ -87,7 +76,7 @@ namespace BangumiArchive.UIModule
 
             WatchingCB.IsChecked = NWatchedCB.IsChecked = false;
             RankAllCB.IsChecked = true;
-            ReviewCBs.ForEach(cur => cur.IsChecked = true);
+            foreach (ReviewBoolPair r in ReviewChecked) r.Second = true;
             CompanyTB.Text = "";
 
             ResetIndexList();
@@ -118,7 +107,7 @@ namespace BangumiArchive.UIModule
                 return false;
 
             // Rank
-            if (!(bool)ReviewCBs[(int)series.Review].IsChecked)
+            if (!ReviewChecked[(int)series.Review].Second)
                 return false;
 
             // Is Watching
@@ -191,8 +180,12 @@ namespace BangumiArchive.UIModule
         private void RankAllClick(object sender, RoutedEventArgs e)
         {
             CheckBox cb = (CheckBox)sender;
-            if ((bool)cb.IsChecked) { ReviewCBs.ForEach(cur => cur.IsChecked = true); }
-            else { ReviewCBs.ForEach(cur => cur.IsChecked = false); }
+            if ((bool)cb.IsChecked) {
+                foreach (ReviewBoolPair r in ReviewChecked) r.Second = true;
+            }
+            else { 
+                foreach (ReviewBoolPair r in ReviewChecked) r.Second = false; 
+            }
         }
 
         /// <summary>
@@ -209,7 +202,7 @@ namespace BangumiArchive.UIModule
                 return;
             }
 
-            if (ReviewCBs.All(cur => (bool)cur.IsChecked))
+            if (ReviewChecked.ToList().All(cur => (bool)cur.Second))
                 RankAllCB.IsChecked = true;
         }
 
@@ -224,29 +217,16 @@ namespace BangumiArchive.UIModule
             if (imported) ResetIndexList();
         }
 
-        private void ExportClick(object sender, RoutedEventArgs e) =>
-            DataManager.ExportSeries();
-
-        private void FilterClick(object sender, RoutedEventArgs e) => FilterSeries();
-
-        private void ClearFilterClick(object sender, RoutedEventArgs e) => ResetFilter();
-
         private void SeriesItemClick(object sender, ItemClickEventArgs e) =>
             MainPage.NavigateDetailView((SeriesIndex)e.ClickedItem);
+    }
 
-        private void TrimTextSuggest(object sender, RoutedEventArgs e) =>
-            UIDictionary.TrimTextSuggest(sender, e);
+    public class ReviewBoolPair : Pair<Review, bool> 
+    {
+        public ReviewBoolPair(Review f, bool s) : base(f, s)
+        {
+        }
 
-        private void SaveClick(object sender, RoutedEventArgs e) =>
-            DataManager.SaveData();
-
-        private void CompanyTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs e) =>
-            UIDictionary.CompanyTextChanged(sender, e);
-
-        private void SearchTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs e) =>
-            UIDictionary.SearchTextChanged(sender, e);
-
-        private void SearchQuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs e) =>
-            UIDictionary.SearchQuerySubmitted(sender, e);
+        public string ReviewStr => ReviewHelper.ToString(First);
     }
 }

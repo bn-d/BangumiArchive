@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:global="using:BangumiArchive"
+    xmlns:local="using:BangumiArchive.UIModule"
     mc:Ignorable="d"
     RequestedTheme="Dark"
     NavigationCacheMode="Enabled">
@@ -29,14 +30,32 @@
                             HorizontalAlignment="Right" VerticalAlignment="Center"
                             MinWidth="50" Background="{x:Null}" BorderBrush="{x:Null}">
                         <Button.Flyout>
-                            <MenuFlyout Placement="Bottom">
-                                <MenuFlyoutItem Text="5" Background="White" Foreground="White" Click="ChangeRankClick"/>
-                                <MenuFlyoutItem Text="4" Background="#FF5BEBE2" Foreground="#FF5BEBE2" Click="ChangeRankClick"/>
-                                <MenuFlyoutItem Text="3" Background="#FFE0E710" Foreground="#FFE0E710" Click="ChangeRankClick"/>
-                                <MenuFlyoutItem Text="2" Background="#FFBFBFBF" Foreground="#FFBFBFBF" Click="ChangeRankClick"/>
-                                <MenuFlyoutItem Text="1" Background="#FFF0853D" Foreground="#FFF0853D" Click="ChangeRankClick"/>
-                                <MenuFlyoutItem Text="0" Background="Black" Foreground="Black" Click="ChangeRankClick"/>
-                            </MenuFlyout>
+                            <Flyout Placement="Bottom">
+                                <Flyout.FlyoutPresenterStyle>
+                                    <Style TargetType="FlyoutPresenter">
+                                        <Setter Property="Padding" Value="0"/>
+                                        <Setter Property="MinWidth" Value="80"/>
+                                    </Style>
+                                </Flyout.FlyoutPresenterStyle>
+                                <ListView ItemsSource="{x:Bind global:ReviewHelper.All}" 
+                                          IsItemClickEnabled="True" ItemClick="ChangeRankItemClick"
+                                          SelectionMode="None">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate x:DataType="global:Review">
+                                            <Rectangle Width="80" Height="30" 
+                                                       Fill="{Binding Converter={StaticResource RankColorConverter}}"/>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                    <ListView.ItemContainerStyle>
+                                        <Style TargetType="ListViewItem">
+                                            <Setter Property="Margin" Value="0"/>
+                                            <Setter Property="Padding" Value="0"/>
+                                            <Setter Property="MinWidth" Value="80"/>
+                                            <Setter Property="MinHeight" Value="30"/>
+                                        </Style>
+                                    </ListView.ItemContainerStyle>
+                                </ListView>
+                            </Flyout>
                         </Button.Flyout>
                     </Button>
                     <Rectangle x:Name="RankBar" 
@@ -47,13 +66,13 @@
                                  Style="{StaticResource TBStyle}" 
                                  FontSize="36" MinWidth="500" 
                                  PlaceholderText="Series Title"
-                                 LostFocus="TrimText"/>
+                                 LostFocus="{x:Bind local:UIDictionary.TrimText}"/>
                         <Rectangle Height="3" Fill="White"/>
                         <TextBox x:Name="SubTitleTB"
                                  Text="{x:Bind Series.SubTitle, Mode=TwoWay}" 
                                  Style="{StaticResource TBStyle}" 
                                  MinWidth="500"
-                                 LostFocus="TrimText"/>
+                                 LostFocus="{x:Bind local:UIDictionary.TrimText}"/>
                     </StackPanel>
                 </StackPanel>
 
@@ -80,7 +99,7 @@
                     <TextBox Text="{x:Bind SeasonTitle, Mode=TwoWay}" 
                              Style="{StaticResource TBStyle}"
                              FontSize="24" PlaceholderText="Season Name"
-                             MinWidth="300" LostFocus="TrimText" TextWrapping="Wrap"/>
+                             MinWidth="300" LostFocus="{x:Bind local:UIDictionary.TrimText}" TextWrapping="Wrap"/>
                     <TextBlock Text="By "
                                Style="{StaticResource TBTextStyle}"
                                Margin="10,0,0,7"/>
@@ -88,8 +107,8 @@
                                     Text="{x:Bind Company, Mode=TwoWay}"
                                     Style="{StaticResource TBSuggestStyle}"
                                     PlaceholderText="Company" MinWidth="150"
-                                    LostFocus="TrimTextSuggest" 
-                                    TextChanged="CompanyTextChanged"/>
+                                    LostFocus="{x:Bind local:UIDictionary.TrimTextSuggest}" 
+                                    TextChanged="{x:Bind local:UIDictionary.CompanyTextChanged}"/>
                     <CalendarDatePicker Date="{x:Bind Date, Mode=TwoWay, Converter={StaticResource TimeConverter}}" 
                                         Background="{x:Null}" BorderBrush="{x:Null}" 
                                         Foreground="White" VerticalAlignment="Bottom" 
@@ -99,25 +118,25 @@
                 <StackPanel Orientation="Horizontal">
                     <TextBox Text="{x:Bind Episode, Mode=TwoWay}"
                          Style="{StaticResource TBStyle}"
-                         KeyDown="OnlyDigitKeyDown"
+                         KeyDown="{x:Bind local:UIDictionary.OnlyDigitKeyDown}"
                          TextAlignment="Right" Margin="50,0,0,0"/>
                     <TextBlock Text=" Episodes + "
                                Style="{StaticResource TBTextStyle}"/>
                     <TextBox Text="{x:Bind Extra, Mode=TwoWay}" 
                          Style="{StaticResource TBStyle}"
-                         KeyDown="OnlyDigitKeyDown"
+                         KeyDown="{x:Bind local:UIDictionary.OnlyDigitKeyDown}"
                          TextAlignment="Right" MinWidth="32"/>
                     <TextBlock Text=" Extra"
                                Style="{StaticResource TBTextStyle}"/>
                     <TextBox Text="{x:Bind Length, Mode=TwoWay}"
                          Style="{StaticResource TBStyle}"
-                         KeyDown="OnlyDigitKeyDown"
+                         KeyDown="{x:Bind local:UIDictionary.OnlyDigitKeyDown}"
                          TextAlignment="Right" Margin="50,0,0,0"/>
                     <TextBlock Text=" Mins per Episodes x "
                                Style="{StaticResource TBTextStyle}"/>
                     <TextBox Text="{x:Bind Time, Mode=TwoWay}"
                          Style="{StaticResource TBStyle}"
-                         KeyDown="OnlyDigitKeyDown"
+                         KeyDown="{x:Bind local:UIDictionary.OnlyDigitKeyDown}"
                          TextAlignment="Right"  MinWidth="32"/>
                     <TextBlock Text=" Times"
                            Style="{StaticResource TBTextStyle}"/>
@@ -141,7 +160,7 @@
                                                 <TextBox Text="{x:Bind Name, Mode=TwoWay}"
                                                      Style="{StaticResource TBStyle}"
                                                      HorizontalContentAlignment="Stretch"
-                                                     LostFocus="TrimText" MinWidth="200"/>
+                                                     LostFocus="{x:Bind local:UIDictionary.TrimText}" MinWidth="200"/>
                                             </DataTemplate>
                                         </ListView.ItemTemplate>
                                     </ListView>
@@ -170,18 +189,15 @@
         <CommandBar Background="{x:Null}" Margin="0,0,20,0" OverflowButtonVisibility="Collapsed">
             <CommandBar.Content>
                 <StackPanel Orientation="Horizontal">
-                    <AppBarButton Icon="Back" Label="" Click="BackClick" VerticalAlignment="Bottom"/>
-                    <AutoSuggestBox x:Name="AnimeSearchBox" QueryIcon="Find"
-                                    Margin="0,5,0,0"
-                                    PlaceholderText="Search" FontSize="18"
-                                    Width="300" VerticalAlignment="Top"
-                                    TextChanged="SearchTextChanged" QuerySubmitted="SearchQuerySubmitted"/>
+                    <AppBarButton Icon="Back" Label="" VerticalAlignment="Bottom"
+                                  Click="{x:Bind global:MainPage.NavigateMainView}"/>
+                    <AutoSuggestBox Template="{StaticResource SeriesSearchBox}"/>
                 </StackPanel>
             </CommandBar.Content>
 
             <AppBarButton Icon="Add" Label="" Click="AddSeasonClick"/>
             <AppBarButton Icon="Remove" Label="" Click="RemoveSeasonClick"/>
-            <AppBarButton Icon="Save" Label="" Click="SaveClick"/>
+            <AppBarButton Template="{StaticResource SaveButton}"/>
         </CommandBar>
     </Grid>
 </Page>

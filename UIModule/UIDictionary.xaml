@@ -9,6 +9,19 @@
     <local:RankColorConverter x:Key="RankColorConverter"/>
     <global:SongListConverter x:Key="SongListConverter"/>
 
+    <ControlTemplate x:Key="SeriesSearchBox" TargetType="AutoSuggestBox">
+        <AutoSuggestBox x:Name="AnimeSearchBox" QueryIcon="Find"
+                        Margin="0,5,0,0"
+                        PlaceholderText="Search" FontSize="18"
+                        Width="300" VerticalAlignment="Top"
+                        TextChanged="{x:Bind local:UIDictionary.SearchTextChanged}" 
+                        QuerySubmitted="{x:Bind local:UIDictionary.SearchQuerySubmitted}"/>
+    </ControlTemplate>
+
+    <ControlTemplate x:Key="SaveButton" TargetType="AppBarButton">
+        <AppBarButton Icon="Save" Label="" Click="{x:Bind global:DataManager.SaveData}"/>
+    </ControlTemplate>
+
     <Style x:Key="TBStyle" TargetType="TextBox">
         <Setter Property="Background" Value="{x:Null}"/>
         <Setter Property="BorderBrush" Value="{x:Null}"/>
@@ -40,7 +53,7 @@
             <TextBox Text="{x:Bind Name, Mode=TwoWay}"
                      Style="{StaticResource TBStyle}"
                      HorizontalAlignment="Left" MinWidth="400"
-                     FontSize="24" LostFocus="TrimText"/>
+                     FontSize="24" LostFocus="{x:Bind local:UIDictionary.TrimText}"/>
             <GridView ItemsSource="{x:Bind NameList}" SelectionMode="None" 
                       CanDragItems="True" CanReorderItems="True" AllowDrop="True"
                       DragItemsCompleted="OtherListReorderCompleted">
@@ -52,7 +65,7 @@
                                        Width="30" Margin="0,0,10,7" TextAlignment="Right"/>
                             <TextBox Text="{x:Bind Str, Mode=TwoWay}"
                                      Style="{StaticResource TBStyle}"
-                                     LostFocus="TrimText"
+                                     LostFocus="{x:Bind local:UIDictionary.TrimText}"
                                      Width="300"/>
                         </StackPanel>
                     </DataTemplate>

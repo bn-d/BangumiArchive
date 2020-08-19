@@ -18,12 +18,12 @@ namespace BangumiArchive.UIModule
 
         private int reviewNum;
         private float reviewAvg;
-        private ObservableCollection<Pair> reviewRank;
+        private ObservableCollection<ReviewIntPair> reviewRank;
 
         private int seasonNum;
         private int companyNum;
-        private ObservableCollection<Pair> companyRank;
-        private ObservableCollection<Pair> companyReviewRank;
+        private ObservableCollection<NamePair> companyRank;
+        private ObservableCollection<NamePair> companyReviewRank;
 
         private int songNum;
         public static ObservableCollection<string> SongList;
@@ -65,17 +65,11 @@ namespace BangumiArchive.UIModule
                 reviewAvg = (float)reviewedTotal / reviewNum;
             }
 
-            reviewRank = DataManager.SIs.Aggregate(new ObservableCollection<Pair>
+            reviewRank = DataManager.SIs.Aggregate(
+                new ObservableCollection<ReviewIntPair>(ReviewHelper.All.Select(cur => new ReviewIntPair(cur, 0)).ToList()), 
+                (acc, cur) =>
             {
-                new Pair("Rank 5", 0),
-                new Pair("Rank 4", 0),
-                new Pair("Rank 3", 0),
-                new Pair("Rank 2", 0),
-                new Pair("Rank 1", 0),
-                new Pair("No Rank", 0),
-            }, (acc, cur) =>
-            {
-                acc[(int)cur.Series.Review].Num += 1;
+                acc[(int)cur.Series.Review].Second += 1;
                 return acc;
             });
 
@@ -96,15 +90,15 @@ namespace BangumiArchive.UIModule
                         return acc;
                     });
                 var companys = companyDict.Keys;
-                companyRank = companys.Aggregate(new ObservableCollection<Pair>(), (acc, cur) =>
+                companyRank = companys.Aggregate(new ObservableCollection<NamePair>(), (acc, cur) =>
                 {
                     if (companyDict[cur] >= 4)
                     {
-                        acc.Add(new Pair(cur, companyDict[cur]));
+                        acc.Add(new NamePair(cur, companyDict[cur]));
                     }
                     return acc;
                 });
-                companyRank = new ObservableCollection<Pair>(companyRank.OrderByDescending(i => i.Num));
+                companyRank = new ObservableCollection<NamePair>(companyRank.OrderByDescending(i => i.Second));
 
                 companyNum = companys.Count;
 
@@ -120,16 +114,16 @@ namespace BangumiArchive.UIModule
                         }
                         return acc;
                     });
-                companyReviewRank = companys.Aggregate(new ObservableCollection<Pair>(), (acc, cur) =>
+                companyReviewRank = companys.Aggregate(new ObservableCollection<NamePair>(), (acc, cur) =>
                 {
                     if (companyDict[cur] >= 4)
                     {
                         float avg = (float)(int)((float)companyReviewDict[cur] / companyDict[cur] * 100) / 100;
-                        acc.Add(new Pair(cur, avg));
+                        acc.Add(new NamePair(cur, avg));
                     }
                     return acc;
                 });
-                companyReviewRank = new ObservableCollection<Pair>(companyReviewRank.OrderByDescending(i => i.Num));
+                companyReviewRank = new ObservableCollection<NamePair>(companyReviewRank.OrderByDescending(i => i.Second));
             }
 
             // Count song related statistics
@@ -148,13 +142,6 @@ namespace BangumiArchive.UIModule
 
             Bindings.Update();
         }
-
-        /// <summary>
-        /// Refresh the statistics view
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void RefreshClick(object sender, RoutedEventArgs e) => RefreshStatistic();
 
         /// <summary>
         /// Navigate to the song page
@@ -190,15 +177,7 @@ namespace BangumiArchive.UIModule
         /// <param name="e"></param>
         private void ReviewItemClick(object sender, ItemClickEventArgs e)
         {
-            MainView.ReviewFilter = ((Pair)e.ClickedItem).Name switch
-            {
-                "Rank 5" => Review.Rank5,
-                "Rank 4" => Review.Rank4,
-                "Rank 3" => Review.Rank3,
-                "Rank 2" => Review.Rank2,
-                "Rank 1" => Review.Rank1,
-                _ => Review.NoRank,
-            };
+            MainView.ReviewFilter = ((ReviewIntPair)e.ClickedItem).First;
             MainPage.NavigateMainView();
         }
 
@@ -209,23 +188,21 @@ namespace BangumiArchive.UIModule
         /// <param name="e"></param>
         private void CompanyItemClick(object sender, ItemClickEventArgs e)
         {
-            MainView.CompanyFilter = ((Pair)e.ClickedItem).Name;
+            MainView.CompanyFilter = ((NamePair)e.ClickedItem).First;
             MainPage.NavigateMainView();
         }
     }
 
-    /// <summary>
-    /// A simple string, float pair
-    /// </summary>
-    public class Pair
+    public class NamePair : Pair<string, float>
     {
-        public string Name;
-        public float Num;
+        public string PairString => String.Format("{0}   {1}", First, Second);
+        public NamePair(string f, float s) : base(f, s) {}
+    }
 
-        public Pair(string name, float num)
-        {
-            Name = name;
-            Num = num;
-        }
+    public class ReviewIntPair : Pair<Review, int>
+    {
+        public string PairString => String.Format("{0}   {1}", 
+            ReviewHelper.ToString(First), Second);
+        public ReviewIntPair(Review f, int s) : base(f, s) { }
     }
 }
