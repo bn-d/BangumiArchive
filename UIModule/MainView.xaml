@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:global="using:BangumiArchive"
+    xmlns:local="using:BangumiArchive.UIModule"
     mc:Ignorable="d"
     RequestedTheme="Dark"
     NavigationCacheMode="Enabled">
@@ -43,28 +44,30 @@
                 <TextBlock Text="Rank" Margin="0,20,0,0"/>
                 <CheckBox x:Name="RankAllCB" Content="All" Margin="20,0,0,0" IsChecked="True"
                           Click="RankAllClick"/>
-                <CheckBox x:Name="Rank5CB" Content="Rank 5" Margin="20,0,0,0" IsChecked="True"
-                          Click="RankClick"/>
-                <CheckBox x:Name="Rank4CB" Content="Rank 4" Margin="20,0,0,0" IsChecked="True"
-                          Click="RankClick"/>
-                <CheckBox x:Name="Rank3CB" Content="Rank 3" Margin="20,0,0,0" IsChecked="True"
-                          Click="RankClick"/>
-                <CheckBox x:Name="Rank2CB" Content="Rank 2" Margin="20,0,0,0" IsChecked="True"
-                          Click="RankClick"/>
-                <CheckBox x:Name="Rank1CB" Content="Rank 1" Margin="20,0,0,0" IsChecked="True"
-                          Click="RankClick"/>
-                <CheckBox x:Name="NoRankCB" Content="No Rank" Margin="20,0,0,0" IsChecked="True"
-                          Click="RankClick"/>
+                <ListView ItemsSource="{x:Bind ReviewChecked}" SelectionMode="None">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="local:ReviewBoolPair">
+                            <CheckBox Content="{x:Bind ReviewStr}" Margin="0" IsChecked="{x:Bind Second, Mode=TwoWay}"
+                                      Click="RankClick"/>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Margin" Value="20,0,0,0"/>
+                            <Setter Property="MinHeight" Value="32"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                </ListView>
 
-                <TextBlock Text="Production Company" Margin="0,20,0,0"/>
                 <AutoSuggestBox x:Name="CompanyTB"
-                                Width="200"
-                                LostFocus="TrimTextSuggest" TextChanged="CompanyTextChanged"/>
+                                Width="200" Margin="0,20,0,0"
+                                PlaceholderText="Production Company"
+                                LostFocus="{x:Bind local:UIDictionary.TrimTextSuggest}" 
+                                TextChanged="{x:Bind local:UIDictionary.CompanyTextChanged}"/>
 
                 <StackPanel Orientation="Horizontal" Margin="0,50,0,0" HorizontalAlignment="Right">
-                    <Button Content="Clear" Click="ClearFilterClick"/>
-                    <Button Content="Filter" 
-                            Click="FilterClick" Margin="10,0,0,0"/>
+                    <Button Content="Clear" Click="{x:Bind ResetFilter}"/>
+                    <Button Content="Filter" Click="{x:Bind FilterSeries}" Margin="10,0,0,0"/>
                 </StackPanel>
             </StackPanel>
         </SplitView.Pane>
@@ -84,27 +87,23 @@
                     </ItemsPanelTemplate>
                 </GridView.ItemsPanel>
             </GridView>
-            
+
             <CommandBar Background="{x:Null}" Margin="0,0,20,0">
                 <CommandBar.Content>
                     <StackPanel Orientation="Horizontal">
                         <AppBarButton Icon="Filter" Click="ChangeFilterSplitViewClick"/>
-                        <AutoSuggestBox x:Name="AnimeSearchBox" QueryIcon="Find"
-                                        Margin="0,5,0,0"
-                                        PlaceholderText="Search" FontSize="18"
-                                        Width="300" VerticalAlignment="Top"
-                                        TextChanged="SearchTextChanged" QuerySubmitted="SearchQuerySubmitted"/>
+                        <AutoSuggestBox Template="{StaticResource SeriesSearchBox}"/>
                     </StackPanel>
                 </CommandBar.Content>
 
                 <CommandBar.SecondaryCommands>
-                    <AppBarButton Label="Export" Click="ExportClick"/>
+                    <AppBarButton Label="Export" Click="{x:Bind global:DataManager.ExportSeries}"/>
                     <AppBarButton Label="Import" Click="ImportAsynClick"/>
                 </CommandBar.SecondaryCommands>
 
                 <AppBarButton Icon="Add" Label="" Click="AddSeriesAsyncClick"/>
                 <AppBarButton Icon="Up" Label="" Click="ScrollToTopClick"/>
-                <AppBarButton Icon="Save" Label="" Click="SaveClick"/>
+                <AppBarButton Template="{StaticResource SaveButton}"/>
             </CommandBar>
         </Grid>
     </SplitView>

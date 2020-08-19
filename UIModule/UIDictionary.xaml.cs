@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using Windows.System;
 using Windows.UI;
@@ -65,10 +66,7 @@ namespace BangumiArchive.UIModule
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void TrimText(object sender, RoutedEventArgs e) =>
-            TrimTextHelper(sender, e);
-
-        public static void TrimTextHelper(object sender, RoutedEventArgs e)
+        public static void TrimText(object sender, RoutedEventArgs e)
         {
             TextBox TB = (TextBox)sender;
             TB.Text = TB.Text.Trim();
@@ -168,19 +166,6 @@ namespace BangumiArchive.UIModule
             sender.ItemsSource = l;
         }
 
-        public static string GetString(Review r)
-        {
-            return r switch
-            {
-                Review.Rank5 => "Rank 5",
-                Review.Rank4 => "Rank 4",
-                Review.Rank3 => "Rank 3",
-                Review.Rank2 => "Rank 2",
-                Review.Rank1 => "Rank 1",
-                _ => "No Rank",
-            };
-        }
-
     }
 
     /// <summary>
@@ -205,5 +190,35 @@ namespace BangumiArchive.UIModule
         {
             throw new NotImplementedException();
         }
+    }
+
+    /// <summary>
+    /// A simple pair
+    /// </summary>
+    public class Pair<FirstT, SecondT> : INotifyPropertyChanged
+    {
+        public FirstT First;
+        private SecondT second;
+        public SecondT Second
+        {
+            get { return second; }
+            set {
+                second = value;
+                OnPropertyChanged("Second");
+            }
+        }
+
+        public Pair(FirstT f, SecondT s)
+        {
+            First = f;
+            Second = s;
+        }
+
+        internal void OnPropertyChanged(string name)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

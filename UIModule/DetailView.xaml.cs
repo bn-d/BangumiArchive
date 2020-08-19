@@ -6,7 +6,6 @@ using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
@@ -91,9 +90,9 @@ namespace BangumiArchive.UIModule
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ChangeRankClick(object sender, RoutedEventArgs e)
+        private void ChangeRankItemClick(object sender, ItemClickEventArgs e)
         {
-            Series.Review = (Review)(5 - int.Parse(((MenuFlyoutItem)sender).Text));
+            Series.Review = (Review)e.ClickedItem;
         }
 
         /// <summary>
@@ -108,7 +107,7 @@ namespace BangumiArchive.UIModule
             {
                 ViewMode = PickerViewMode.Thumbnail,
                 SuggestedStartLocation = PickerLocationId.PicturesLibrary,
-                FileTypeFilter = { ".jpg" , ".png" }
+                FileTypeFilter = { ".jpg", ".png" }
             };
 
             StorageFile file = await openPicker.PickSingleFileAsync();
@@ -117,35 +116,11 @@ namespace BangumiArchive.UIModule
 
             IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.Read);
             DataReader reader = new DataReader(stream.GetInputStreamAt(0));
-            await reader.LoadAsync((uint) stream.Size);
+            await reader.LoadAsync((uint)stream.Size);
             Series.FlagByte = new byte[stream.Size];
             reader.ReadBytes(Series.FlagByte);
 
             Series.OnPropertyChanged("Flag");
         }
-
-        private void BackClick(object sender, RoutedEventArgs e) => 
-            MainPage.NavigateMainView();
-
-        private void SaveClick(object sender, RoutedEventArgs e) =>
-            DataManager.SaveData();
-
-        private void OnlyDigitKeyDown(object sender, KeyRoutedEventArgs e) =>
-            UIDictionary.OnlyDigitKeyDown(sender, e);
-
-        private void TrimText(object sender, RoutedEventArgs e) =>
-            UIDictionary.TrimTextHelper(sender, e);
-
-        private void TrimTextSuggest(object sender, RoutedEventArgs e) =>
-            UIDictionary.TrimTextSuggest(sender, e);
-
-        private void CompanyTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs e) =>
-            UIDictionary.CompanyTextChanged(sender, e);
-
-        private void SearchTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs e) =>
-            UIDictionary.SearchTextChanged(sender, e);
-
-        private void SearchQuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs e) =>
-            UIDictionary.SearchQuerySubmitted(sender, e);
     }
 }

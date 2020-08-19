@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -38,8 +39,6 @@ namespace BangumiArchive
     [DataContract]
     public class Series : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
         [DataMember]
         internal int Index;
         [DataMember]
@@ -128,6 +127,7 @@ namespace BangumiArchive
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 
     /// <summary>
@@ -141,6 +141,38 @@ namespace BangumiArchive
         Rank2 = 3,
         Rank1 = 4,
         NoRank = 5,
+    }
+
+    public static class ReviewHelper
+    {
+        public readonly static List<Review> All = Enum.GetValues(typeof(Review)).Cast<Review>().ToList();
+        public static int Count => All.Count;
+
+        public static string ToString(Review r)
+        {
+            return r switch
+            {
+                Review.Rank5 => "Rank 5",
+                Review.Rank4 => "Rank 4",
+                Review.Rank3 => "Rank 3",
+                Review.Rank2 => "Rank 2",
+                Review.Rank1 => "Rank 1",
+                _ => "No Rank",
+            };
+        }
+
+        public static Review FromString(string s)
+        { 
+            return s switch
+            {
+                "Rank 5" => Review.Rank5,
+                "Rank 4" => Review.Rank4,
+                "Rank 3" => Review.Rank3,
+                "Rank 2" => Review.Rank2,
+                "Rank 1" => Review.Rank1,
+                _ => Review.NoRank,
+            };
+        }
     }
 
     /// <summary>
