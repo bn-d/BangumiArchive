@@ -90,7 +90,7 @@ namespace BangumiArchive.UIModule
         /// <param name="e"></param>
         public static void OnlyDigitKeyDown(object sender, KeyRoutedEventArgs e)
         {
-            if ((e.Key < VirtualKey.NumberPad0 || e.Key > VirtualKey.NumberPad9) & 
+            if ((e.Key < VirtualKey.NumberPad0 || e.Key > VirtualKey.NumberPad9) &
                 (e.Key < VirtualKey.Number0 || e.Key > VirtualKey.Number9))
             {
                 e.Handled = true;
@@ -120,54 +120,7 @@ namespace BangumiArchive.UIModule
                     sender.ItemsSource = new string[] { "No results found" };
             }
         }
-
-        /// <summary>
-        /// Add a new item
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void AddListItem(object sender, RoutedEventArgs e)
-        {
-            StackPanel parent = (StackPanel)VisualTreeHelper.GetParent(
-                VisualTreeHelper.GetParent((AppBarButton)sender));
-            GridView nameList = (GridView)VisualTreeHelper.GetChild(parent, 1);
-            ObservableCollection<StringWrap> names = (ObservableCollection<StringWrap>)nameList.ItemsSource;
-            names.Add(new StringWrap(names.Count + 1));
-        }
-
-        /// <summary>
-        /// Remove the last item, if the list is not empty
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void RemoveListItem(object sender, RoutedEventArgs e)
-        {
-            StackPanel parent = (StackPanel)VisualTreeHelper.GetParent(
-                VisualTreeHelper.GetParent((AppBarButton)sender));
-            GridView nameList = (GridView)VisualTreeHelper.GetChild(parent, 1);
-            ObservableCollection<StringWrap> names = (ObservableCollection<StringWrap>)nameList.ItemsSource;
-            if (names.Any())
-                names.RemoveAt(names.Count - 1);
-        }
-
-        /// <summary>
-        /// Reassign the index number after reorder
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
-        private void OtherListReorderCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
-        {
-            ObservableCollection<StringWrap> l = (ObservableCollection<StringWrap>) sender.ItemsSource;
-            for (int i = 0; i < l.Count(); i++)
-            {
-                l[i].Index = i + 1;
-            }
-            sender.ItemsSource = null;
-            sender.ItemsSource = l;
-        }
-
     }
-
     /// <summary>
     /// Convert review rank to rank color
     /// </summary>
@@ -193,6 +146,44 @@ namespace BangumiArchive.UIModule
     }
 
     /// <summary>
+    /// Convert DateTime to DateTimeOffset
+    /// </summary>
+    public class TimeConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            return new DateTimeOffset(((DateTime)value).ToUniversalTime());
+
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            return ((DateTimeOffset)value).DateTime;
+        }
+    }
+
+    /// <summary>
+    /// Convert song list to string summary
+    /// </summary>
+    public class SongListConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            ObservableCollection<Song> s = (ObservableCollection<Song>)value;
+            if (s == null || !s.Any())
+                return "Anime Song";
+            else if (s.Count == 1)
+                return "1 Song";
+            else return string.Concat(s.Count.ToString(), " Songs");
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
     /// A simple pair
     /// </summary>
     public class Pair<FirstT, SecondT> : INotifyPropertyChanged
@@ -202,7 +193,8 @@ namespace BangumiArchive.UIModule
         public SecondT Second
         {
             get { return second; }
-            set {
+            set
+            {
                 second = value;
                 OnPropertyChanged("Second");
             }
@@ -222,3 +214,4 @@ namespace BangumiArchive.UIModule
         public event PropertyChangedEventHandler PropertyChanged;
     }
 }
+

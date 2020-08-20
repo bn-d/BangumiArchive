@@ -215,7 +215,7 @@ namespace BangumiArchive.UIModule
         /// <param name="e"></param>
         private async void ImportAsynClick(object sender, RoutedEventArgs e)
         {
-            bool imported = await DataManager.ImportSeries();
+            bool imported = await DataManager.ImportArchive();
             if (imported) ResetIndexList();
         }
 

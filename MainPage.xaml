@@ -8,7 +8,7 @@
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Pivot Name="MainPivot">
-            <PivotItem Header="Main">
+            <PivotItem Header="Main" Background="Black">
                 <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled" Background="Black">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -30,7 +30,30 @@
                     </Frame>
                 </Grid>
             </PivotItem>
-            
+
+            <PivotItem Header="ToWatch">
+                <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled" Background="Black">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid Margin="0" Padding="0" Height="15" Grid.Row="0">
+                        <Grid.Background>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="Black" Offset="1"/>
+                                <GradientStop Color="White"/>
+                            </LinearGradientBrush>
+                        </Grid.Background>
+                    </Grid>
+
+                    <Frame x:Name="ToWatchFrame" Grid.Row="1">
+                        <Frame.Background>
+                            <ImageBrush Stretch="UniformToFill" ImageSource="Assets/background.png"/>
+                        </Frame.Background>
+                    </Frame>
+                </Grid>
+            </PivotItem>
+
             <PivotItem Header="Schedule">
                 <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled" Background="Black">
                     <Grid.RowDefinitions>
@@ -47,29 +70,6 @@
                     </Grid>
 
                     <Frame x:Name="ScheduleFrame" Grid.Row="1">
-                        <Frame.Background>
-                            <ImageBrush Stretch="UniformToFill" ImageSource="Assets/background.png"/>
-                        </Frame.Background>
-                    </Frame>
-                </Grid>
-            </PivotItem>
-            
-            <PivotItem Header="Other">
-                <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled" Background="Black">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <Grid Margin="0" Padding="0" Height="15" Grid.Row="0">
-                        <Grid.Background>
-                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="Black" Offset="1"/>
-                                <GradientStop Color="White"/>
-                            </LinearGradientBrush>
-                        </Grid.Background>
-                    </Grid>
-
-                    <Frame x:Name="OtherFrame" Grid.Row="1" VerticalContentAlignment="Stretch">
                         <Frame.Background>
                             <ImageBrush Stretch="UniformToFill" ImageSource="Assets/background.png"/>
                         </Frame.Background>

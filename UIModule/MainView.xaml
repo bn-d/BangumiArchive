@@ -97,7 +97,7 @@
                 </CommandBar.Content>
 
                 <CommandBar.SecondaryCommands>
-                    <AppBarButton Label="Export" Click="{x:Bind global:DataManager.ExportSeries}"/>
+                    <AppBarButton Label="Export" Click="{x:Bind global:DataManager.ExportArchive}"/>
                     <AppBarButton Label="Import" Click="ImportAsynClick"/>
                 </CommandBar.SecondaryCommands>
 

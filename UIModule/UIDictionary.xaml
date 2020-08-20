@@ -5,9 +5,9 @@
     xmlns:global="using:BangumiArchive"
     xmlns:local="using:BangumiArchive.UIModule">
 
-    <global:TimeConverter x:Key="TimeConverter"/>
+    <local:TimeConverter x:Key="TimeConverter"/>
     <local:RankColorConverter x:Key="RankColorConverter"/>
-    <global:SongListConverter x:Key="SongListConverter"/>
+    <local:SongListConverter x:Key="SongListConverter"/>
 
     <ControlTemplate x:Key="SeriesSearchBox" TargetType="AutoSuggestBox">
         <AutoSuggestBox x:Name="AnimeSearchBox" QueryIcon="Find"
@@ -46,39 +46,6 @@
         <Setter Property="FontSize" Value="18"/>
         <Setter Property="TextBoxStyle" Value="{StaticResource TBStyle}"/>
     </Style>
-
-    <DataTemplate x:Key="OtherListItem" x:DataType="local:OtherList">
-        <StackPanel Margin="0,0,0,10">
-
-            <TextBox Text="{x:Bind Name, Mode=TwoWay}"
-                     Style="{StaticResource TBStyle}"
-                     HorizontalAlignment="Left" MinWidth="400"
-                     FontSize="24" LostFocus="{x:Bind local:UIDictionary.TrimText}"/>
-            <GridView ItemsSource="{x:Bind NameList}" SelectionMode="None" 
-                      CanDragItems="True" CanReorderItems="True" AllowDrop="True"
-                      DragItemsCompleted="OtherListReorderCompleted">
-                <GridView.ItemTemplate>
-                    <DataTemplate x:DataType="local:StringWrap">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{x:Bind Index}" 
-                                       Style="{StaticResource TBTextStyle}"
-                                       Width="30" Margin="0,0,10,7" TextAlignment="Right"/>
-                            <TextBox Text="{x:Bind Str, Mode=TwoWay}"
-                                     Style="{StaticResource TBStyle}"
-                                     LostFocus="{x:Bind local:UIDictionary.TrimText}"
-                                     Width="300"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </GridView.ItemTemplate>
-            </GridView>
-            <StackPanel Orientation="Horizontal">
-                <AppBarButton Icon="Add" Label="Add" Click="AddListItem" IsCompact="True"
-                              VerticalAlignment="Center" HorizontalAlignment="Center" />
-                <AppBarButton Icon="Remove" Label="Remove" Click="RemoveListItem" IsCompact="True"
-                              VerticalAlignment="Center" HorizontalAlignment="Center"/>
-            </StackPanel>
-        </StackPanel>
-    </DataTemplate>
 
     <ControlTemplate x:Key="SplitViewControlInlineTemplate" TargetType="SplitView">
         <Grid Background="{TemplateBinding Background}">

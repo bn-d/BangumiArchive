@@ -113,9 +113,6 @@
     <Compile Include="UIModule\ScheduleView.xaml.cs">
       <DependentUpon>ScheduleView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UIModule\OtherView.xaml.cs">
-      <DependentUpon>OtherView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UIModule\SongView.xaml.cs">
       <DependentUpon>SongView.xaml</DependentUpon>
     </Compile>
@@ -184,10 +181,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UIModule\InputDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UIModule\OtherView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
