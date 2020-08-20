@@ -1,6 +1,5 @@
-﻿using Windows.UI.Xaml.Controls;
-using BangumiArchive.UIModule;
-using static BangumiArchive.DataManager;
+﻿using BangumiArchive.UIModule;
+using Windows.UI.Xaml.Controls;
 
 namespace BangumiArchive
 {
@@ -21,8 +20,6 @@ namespace BangumiArchive
             MainPageFrame.Navigate(typeof(MainView));
             ScheduleFrame.Navigate(typeof(ScheduleView));
             StatisticsFrame.Navigate(typeof(StatisticsView));
-            OtherFrame.Navigate(typeof(OtherView));
-            
         }
 
         public static void NavigateMainView()

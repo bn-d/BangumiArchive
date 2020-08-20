@@ -3,13 +3,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Runtime.Serialization;
 using Windows.Storage.Streams;
-using Windows.UI;
 using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 
 namespace BangumiArchive
@@ -18,18 +15,20 @@ namespace BangumiArchive
     /// The data structure that holds each Bangumi item 
     /// </summary>
     [DataContract]
-    public class Bangumi
+    public class BangumiNotebook
     {
         [DataMember]
         internal string Title;
         [DataMember]
-        internal ObservableCollection<Series> Series;
+        internal ObservableCollection<Series> Watched;
         [DataMember]
-        internal ObservableCollection<Series> WatchList;
+        internal ObservableCollection<Series> ToWatch;
 
-        public Bangumi(string t)
+        public BangumiNotebook(string t)
         {
             Title = t;
+            Watched = new ObservableCollection<Series>();
+            ToWatch = new ObservableCollection<Series>();
         }
     }
 
@@ -39,8 +38,6 @@ namespace BangumiArchive
     [DataContract]
     public class Series : INotifyPropertyChanged
     {
-        [DataMember]
-        internal int Index;
         [DataMember]
         public string Title;
         [DataMember]
@@ -88,9 +85,8 @@ namespace BangumiArchive
         }
         private BitmapImage _flag;
 
-        public Series(int n, string t = "")
+        public Series(string t = "")
         {
-            Index = n;
             Title = t;
             SubTitle = "";
             Review = Review.NoRank;
@@ -211,44 +207,6 @@ namespace BangumiArchive
         public Song()
         {
             Name = "";
-        }
-    }
-
-    /// <summary>
-    /// Convert DateTime to DateTimeOffset
-    /// </summary>
-    public class TimeConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, string language)
-        {
-            return new DateTimeOffset(((DateTime)value).ToUniversalTime());
-
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
-        {
-            return ((DateTimeOffset)value).DateTime;
-        }
-    }
-
-    /// <summary>
-    /// Convert song list to string summary
-    /// </summary>
-    public class SongListConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, string language)
-        {
-            ObservableCollection<Song> s = (ObservableCollection<Song>)value;
-            if (s == null || !s.Any())
-                return "Anime Song";
-            else if (s.Count == 1)
-                return "1 Song";
-            else return string.Concat(s.Count.ToString(), " Songs");
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
-        {
-            throw new NotImplementedException();
         }
     }
 }
