@@ -87,7 +87,7 @@
                     </ItemsPanelTemplate>
                 </GridView.ItemsPanel>
             </GridView>
-            
+
             <CommandBar Background="{x:Null}" Margin="0,0,20,0">
                 <CommandBar.Content>
                     <StackPanel Orientation="Horizontal">

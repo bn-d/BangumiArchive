@@ -180,11 +180,13 @@ namespace BangumiArchive.UIModule
         private void RankAllClick(object sender, RoutedEventArgs e)
         {
             CheckBox cb = (CheckBox)sender;
-            if ((bool)cb.IsChecked) {
+            if ((bool)cb.IsChecked)
+            {
                 foreach (ReviewBoolPair r in ReviewChecked) r.Second = true;
             }
-            else { 
-                foreach (ReviewBoolPair r in ReviewChecked) r.Second = false; 
+            else
+            {
+                foreach (ReviewBoolPair r in ReviewChecked) r.Second = false;
             }
         }
 
@@ -221,7 +223,7 @@ namespace BangumiArchive.UIModule
             MainPage.NavigateDetailView((SeriesIndex)e.ClickedItem);
     }
 
-    public class ReviewBoolPair : Pair<Review, bool> 
+    public class ReviewBoolPair : Pair<Review, bool>
     {
         public ReviewBoolPair(Review f, bool s) : base(f, s)
         {

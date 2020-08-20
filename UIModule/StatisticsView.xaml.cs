@@ -66,7 +66,7 @@ namespace BangumiArchive.UIModule
             }
 
             reviewRank = DataManager.SIs.Aggregate(
-                new ObservableCollection<ReviewIntPair>(ReviewHelper.All.Select(cur => new ReviewIntPair(cur, 0)).ToList()), 
+                new ObservableCollection<ReviewIntPair>(ReviewHelper.All.Select(cur => new ReviewIntPair(cur, 0)).ToList()),
                 (acc, cur) =>
             {
                 acc[(int)cur.Series.Review].Second += 1;
@@ -196,12 +196,12 @@ namespace BangumiArchive.UIModule
     public class NamePair : Pair<string, float>
     {
         public string PairString => String.Format("{0}   {1}", First, Second);
-        public NamePair(string f, float s) : base(f, s) {}
+        public NamePair(string f, float s) : base(f, s) { }
     }
 
     public class ReviewIntPair : Pair<Review, int>
     {
-        public string PairString => String.Format("{0}   {1}", 
+        public string PairString => String.Format("{0}   {1}",
             ReviewHelper.ToString(First), Second);
         public ReviewIntPair(Review f, int s) : base(f, s) { }
     }

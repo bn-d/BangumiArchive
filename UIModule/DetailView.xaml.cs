@@ -107,7 +107,7 @@ namespace BangumiArchive.UIModule
             {
                 ViewMode = PickerViewMode.Thumbnail,
                 SuggestedStartLocation = PickerLocationId.PicturesLibrary,
-                FileTypeFilter = { ".jpg" , ".png" }
+                FileTypeFilter = { ".jpg", ".png" }
             };
 
             StorageFile file = await openPicker.PickSingleFileAsync();
@@ -116,7 +116,7 @@ namespace BangumiArchive.UIModule
 
             IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.Read);
             DataReader reader = new DataReader(stream.GetInputStreamAt(0));
-            await reader.LoadAsync((uint) stream.Size);
+            await reader.LoadAsync((uint)stream.Size);
             Series.FlagByte = new byte[stream.Size];
             reader.ReadBytes(Series.FlagByte);
 
