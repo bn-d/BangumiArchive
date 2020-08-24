@@ -24,11 +24,18 @@ namespace BangumiArchive
     public class SeriesIndex
     {
         public int Index;
+        public bool Watched;
 
-        public SeriesIndex(int index) { Index = index; }
+        public SeriesIndex(int index, bool watched) 
+        { 
+            Index = index;
+            Watched = watched;
+        }
 
-        public string IndexString => (Index + 1).ToString();
-        public Series Series => DataManager.Series[Index];
+        public string IndexString => 
+            Watched ? (Index + 1).ToString() : "";
+        public Series Series => 
+            Watched ? DataManager.Watched[Index] : DataManager.ToWatch[Index];
         public Series S => Series;
 
         public override string ToString() { return Series.Title; }
@@ -37,13 +44,14 @@ namespace BangumiArchive
     /// <summary>
     /// A class for all the global variable
     /// </summary>
-    public static class DataManager
+    public static class DataManager 
     {
         private static string ArchiveFileName = "BangumiArchive.xml";
 
         private static int ArcIndex = 0;
         private static BangumiArchiveType Archive;
-        public static ObservableCollection<SeriesIndex> SeriesIndices;
+        private static ObservableCollection<SeriesIndex> WatchedIndices;
+        private static ObservableCollection<SeriesIndex> ToWatchIndices;
 
         private static string SeriesListHash = "";
         public static HashSet<string> CompanyHashSet;
@@ -53,27 +61,78 @@ namespace BangumiArchive
         public static StorageFolder LocalFolder =
             ApplicationData.Current.LocalFolder;
 
-        internal static ObservableCollection<Series> Series
+        internal static ObservableCollection<Series> Watched
         {
             get { return Archive[ArcIndex].Watched; }
             set { Archive[ArcIndex].Watched = value; }
         }
-        public static ObservableCollection<SeriesIndex> SIs => SeriesIndices;
+        public static ObservableCollection<SeriesIndex> WatchedIdx => WatchedIndices;
+        internal static ObservableCollection<Series> ToWatch
+        {
+            get { return Archive[ArcIndex].ToWatch; }
+            set { Archive[ArcIndex].ToWatch = value; }
+        }
+        public static ObservableCollection<SeriesIndex> ToWatchIdx => ToWatchIndices;
 
         private static HashAlgorithmProvider md5 = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Md5);
 
         /// <summary>
-        /// Add a new series to the current Bangumi item
+        /// Add a new series to the watched list
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static SeriesIndex AddSeries(string name)
+        public static SeriesIndex AddWatchedSeries(string name)
         {
-            int index = Series.Count;
-            Series.Add(new Series(name));
-            SeriesIndices.Add(new SeriesIndex(index));
+            int index = Watched.Count;
+            Watched.Add(new Series(name));
+            WatchedIndices.Add(new SeriesIndex(index, true));
 
-            return SeriesIndices[index];
+            return WatchedIndices[index];
+        }
+
+        /// <summary>
+        /// Add a new series to the to-watch list
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static SeriesIndex AddToWatchSeries(string name)
+        {
+            int index = ToWatch.Count;
+            ToWatch.Add(new Series(name));
+            ToWatchIndices.Add(new SeriesIndex(index, false));
+
+            return WatchedIndices[index];
+        }
+
+        /// <summary>
+        /// Move a to-watch series to the watched list
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public static SeriesIndex MoveToWatchedSeries(int index)
+        {
+            int watchedIndex = Watched.Count;
+
+            Watched.Add(ToWatch[index]);
+            WatchedIndices.Add(new SeriesIndex(watchedIndex, true));
+
+            RemoveToWatchSeries(index);
+            
+            return WatchedIndices[watchedIndex];
+        }
+
+        /// <summary>
+        /// Delete a to-watch series
+        /// </summary>
+        /// <param name="index"></param>
+        public static void RemoveToWatchSeries(int index)
+        {
+            ToWatch.RemoveAt(index);
+            ToWatchIdx.RemoveAt(index);
+            foreach (var si in ToWatchIdx)
+            {
+                if (si.Index > index) { si.Index -= 1; }
+            }
         }
 
         /// <summary>
@@ -224,7 +283,7 @@ namespace BangumiArchive
         public static void SetCompanyList()
         {
             DataManager.CompanyHashSet = new HashSet<string>();
-            foreach (Series a in Series)
+            foreach (Series a in Watched)
             {
                 foreach (Season s in a.Seasons)
                 {
@@ -251,8 +310,10 @@ namespace BangumiArchive
         /// </summary>
         private static void ResetSeriesIndices()
         {
-            SeriesIndices = new ObservableCollection<SeriesIndex>(
-                Enumerable.Range(0, DataManager.Series.Count).Select(i => new SeriesIndex(i)));
+            WatchedIndices = new ObservableCollection<SeriesIndex>(
+                Enumerable.Range(0, Watched.Count).Select(i => new SeriesIndex(i, true)));
+            ToWatchIndices = new ObservableCollection<SeriesIndex>(
+                Enumerable.Range(0, ToWatch.Count).Select(i => new SeriesIndex(i, false)));
         }
 
         /// <summary>
@@ -280,7 +341,6 @@ namespace BangumiArchive
         {
             memoryStream.Position = 0;
             IBuffer buffHash = md5.HashData(memoryStream.GetWindowsRuntimeBuffer());
-            //Debug.WriteLine(CryptographicBuffer.EncodeToBase64String(buffHash));
             return CryptographicBuffer.EncodeToBase64String(buffHash);
         }
 

@@ -11,10 +11,12 @@
     NavigationCacheMode="Enabled">
 
     <Page.Resources>
-        <DataTemplate x:Key="AnimeGridItem" x:DataType="global:SeriesIndex">
+        <DataTemplate x:Key="WatchedItem" x:DataType="global:SeriesIndex">
             <StackPanel Orientation="Horizontal" 
+                        Margin="30,10" Width="450"
                         HorizontalAlignment="Left" VerticalAlignment="Top" 
-                        Margin="50,10" Width="400">
+                        ToolTipService.ToolTip="{x:Bind Series.Title}"
+                        ToolTipService.Placement="Bottom">
                 <Image Source="{x:Bind Series.Flag}" 
                        Height="30" Width="30" HorizontalAlignment="Left"
                        ScrollViewer.VerticalScrollBarVisibility="Disabled" />
@@ -79,8 +81,8 @@
                       Padding="0,50"
                       IsItemClickEnabled="True" ItemClick="SeriesItemClick"
                       SelectionMode="None"
-                      ItemsSource="{x:Bind IndexList}"
-                      ItemTemplate="{StaticResource AnimeGridItem}">
+                      ItemsSource="{x:Bind Indices}"
+                      ItemTemplate="{StaticResource WatchedItem}">
                 <GridView.ItemsPanel>
                     <ItemsPanelTemplate>
                         <ItemsWrapGrid Orientation="Horizontal" HorizontalAlignment="Center"/>
@@ -101,8 +103,10 @@
                     <AppBarButton Label="Import" Click="ImportAsynClick"/>
                 </CommandBar.SecondaryCommands>
 
-                <AppBarButton Icon="Add" Label="" Click="AddSeriesAsyncClick"/>
                 <AppBarButton Icon="Up" Label="" Click="ScrollToTopClick"/>
+                <AppBarButton 
+                    Icon="Add" Click="AddSeriesAsyncClick"
+                    ToolTipService.ToolTip="Add" ToolTipService.Placement="Bottom"/>
                 <AppBarButton Template="{StaticResource SaveButton}"/>
             </CommandBar>
         </Grid>

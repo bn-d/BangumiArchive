@@ -15,10 +15,11 @@ namespace BangumiArchive.UIModule
 
         public ScheduleView()
         {
-            weekList = new WeekList();
-            RefreshWeeklyView();
             InitializeComponent();
             DataContextChanged += (s, e) => Bindings.Update();
+
+            weekList = new WeekList();
+            RefreshWeeklyView();
         }
 
         /// <summary>
@@ -28,7 +29,7 @@ namespace BangumiArchive.UIModule
         {
             weekList.Clear();
 
-            foreach (SeriesIndex i in DataManager.SeriesIndices)
+            foreach (SeriesIndex i in DataManager.WatchedIdx)
             {
                 if (i.Series.IsWatching && i.Series.HasSeason())
                 {

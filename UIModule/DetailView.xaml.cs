@@ -16,8 +16,10 @@ namespace BangumiArchive.UIModule
     /// </summary>
     public sealed partial class DetailView : Page
     {
-        private ObservableCollection<SeriesIndex> IndexList => DataManager.SeriesIndices;
-        private SeriesIndex Index => IndexList[SeriesDetail.SelectedIndex];
+        private bool Watched;
+        private ObservableCollection<SeriesIndex> Indices => 
+            Watched ? DataManager.WatchedIdx : DataManager.ToWatchIdx;
+        private SeriesIndex Index => Indices[SeriesDetail.SelectedIndex];
         private Series Series => Index.Series;
 
         public DetailView()
@@ -32,6 +34,9 @@ namespace BangumiArchive.UIModule
         /// <param name="e"></param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+            Watched = ((SeriesIndex)e.Parameter).Watched;
+            if (!Watched) { SeriesSearchBox.Visibility = Visibility.Collapsed; }
+
             SeriesDetail.SelectedIndex = ((SeriesIndex)e.Parameter).Index;
         }
 
@@ -121,6 +126,17 @@ namespace BangumiArchive.UIModule
             reader.ReadBytes(Series.FlagByte);
 
             Series.OnPropertyChanged("Flag");
+        }
+
+        /// <summary>
+        /// Back to previous page
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BackClick(object sender, RoutedEventArgs e)
+        {
+            if (Watched) { MainPage.NavigateMainView(); }
+            else { MainPage.NavigateToWatchView(); }
         }
     }
 }

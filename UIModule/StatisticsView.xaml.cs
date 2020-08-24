@@ -41,10 +41,10 @@ namespace BangumiArchive.UIModule
         /// </summary>
         private void RefreshStatistic()
         {
-            animeNum = DataManager.SIs.Count;
+            animeNum = DataManager.WatchedIdx.Count;
 
             {
-                int totalMin = DataManager.SIs.Sum(cur =>
+                int totalMin = DataManager.WatchedIdx.Sum(cur =>
                 {
                     int temp = 0;
                     foreach (Season s in cur.Series.Seasons)
@@ -56,16 +56,16 @@ namespace BangumiArchive.UIModule
                 totalTime = new TimeSpan(0, 0, totalMin, 0);
             }
 
-            watchingNum = DataManager.SIs.Count(cur => cur.Series.IsWatching);
+            watchingNum = DataManager.WatchedIdx.Count(cur => cur.Series.IsWatching);
 
-            reviewNum = DataManager.SIs.Count(cur => cur.Series.Review != Review.NoRank);
+            reviewNum = DataManager.WatchedIdx.Count(cur => cur.Series.Review != Review.NoRank);
 
             {
-                int reviewedTotal = DataManager.SIs.Sum(cur => 5 - (int)cur.Series.Review);
+                int reviewedTotal = DataManager.WatchedIdx.Sum(cur => 5 - (int)cur.Series.Review);
                 reviewAvg = (float)reviewedTotal / reviewNum;
             }
 
-            reviewRank = DataManager.SIs.Aggregate(
+            reviewRank = DataManager.WatchedIdx.Aggregate(
                 new ObservableCollection<ReviewIntPair>(ReviewHelper.All.Select(cur => new ReviewIntPair(cur, 0)).ToList()),
                 (acc, cur) =>
             {
@@ -73,11 +73,11 @@ namespace BangumiArchive.UIModule
                 return acc;
             });
 
-            seasonNum = DataManager.SIs.Aggregate(0, (acc, cur) => acc + cur.Series.Seasons.Count);
+            seasonNum = DataManager.WatchedIdx.Aggregate(0, (acc, cur) => acc + cur.Series.Seasons.Count);
 
             // Count company related statistics
             {
-                Dictionary<string, int> companyDict = DataManager.SIs.Aggregate(new Dictionary<string, int>(),
+                Dictionary<string, int> companyDict = DataManager.WatchedIdx.Aggregate(new Dictionary<string, int>(),
                     (acc, cur) =>
                     {
                         foreach (Season s in cur.Series.Seasons)
@@ -102,7 +102,7 @@ namespace BangumiArchive.UIModule
 
                 companyNum = companys.Count;
 
-                Dictionary<string, int> companyReviewDict = DataManager.SIs.Aggregate(new Dictionary<string, int>(),
+                Dictionary<string, int> companyReviewDict = DataManager.WatchedIdx.Aggregate(new Dictionary<string, int>(),
                     (acc, cur) =>
                     {
                         foreach (Season s in cur.Series.Seasons)
@@ -127,7 +127,7 @@ namespace BangumiArchive.UIModule
             }
 
             // Count song related statistics
-            SongList = DataManager.SIs.Aggregate(new ObservableCollection<string>(),
+            SongList = DataManager.WatchedIdx.Aggregate(new ObservableCollection<string>(),
                 (acc, cur) =>
                 {
                     foreach (Season s in cur.Series.Seasons)

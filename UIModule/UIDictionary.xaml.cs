@@ -32,7 +32,7 @@ namespace BangumiArchive.UIModule
             {
                 var suggestions = new List<SeriesIndex>();
 
-                foreach (SeriesIndex i in DataManager.SIs)
+                foreach (SeriesIndex i in DataManager.WatchedIdx)
                 {
                     if (i.Series.Title.IndexOf(sender.Text, StringComparison.CurrentCultureIgnoreCase) >= 0
                         || i.Series.SubTitle.IndexOf(sender.Text, StringComparison.CurrentCultureIgnoreCase) >= 0)

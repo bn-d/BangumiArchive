@@ -10,16 +10,22 @@
     <local:SongListConverter x:Key="SongListConverter"/>
 
     <ControlTemplate x:Key="SeriesSearchBox" TargetType="AutoSuggestBox">
-        <AutoSuggestBox x:Name="AnimeSearchBox" QueryIcon="Find"
-                        Margin="0,5,0,0"
-                        PlaceholderText="Search" FontSize="18"
-                        Width="300" VerticalAlignment="Top"
-                        TextChanged="{x:Bind local:UIDictionary.SearchTextChanged}" 
-                        QuerySubmitted="{x:Bind local:UIDictionary.SearchQuerySubmitted}"/>
+        <AutoSuggestBox 
+            QueryIcon="Find"
+            PlaceholderText="Search" FontSize="18"
+            Width="300" Margin="0,5,0,0"
+            VerticalAlignment="Top"
+            ToolTipService.ToolTip="Search for Series"
+            ToolTipService.Placement="Bottom"
+            TextChanged="{x:Bind local:UIDictionary.SearchTextChanged}" 
+            QuerySubmitted="{x:Bind local:UIDictionary.SearchQuerySubmitted}"/>
     </ControlTemplate>
 
     <ControlTemplate x:Key="SaveButton" TargetType="AppBarButton">
-        <AppBarButton Icon="Save" Label="" Click="{x:Bind global:DataManager.SaveData}"/>
+        <AppBarButton 
+            Icon="Save" Click="{x:Bind global:DataManager.SaveData}" 
+            ToolTipService.ToolTip="Add"
+            ToolTipService.Placement="Bottom"/>
     </ControlTemplate>
 
     <Style x:Key="TBStyle" TargetType="TextBox">

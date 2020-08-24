@@ -15,9 +15,9 @@ namespace BangumiArchive.UIModule
         public static bool IsFiltered = false;
         public static string CompanyFilter = "";
         public static Review? ReviewFilter;
-        public static ObservableCollection<SeriesIndex> StaticIndexList;
+        public static ObservableCollection<SeriesIndex> StaticIndices;
 
-        private ObservableCollection<SeriesIndex> IndexList => StaticIndexList;
+        private ObservableCollection<SeriesIndex> Indices => StaticIndices;
         private ObservableCollection<ReviewBoolPair> ReviewChecked;
 
         public MainView()
@@ -63,7 +63,7 @@ namespace BangumiArchive.UIModule
         /// </summary>
         private void ResetIndexList()
         {
-            StaticIndexList = new ObservableCollection<SeriesIndex>(DataManager.SIs);
+            StaticIndices = new ObservableCollection<SeriesIndex>(DataManager.WatchedIdx);
             Bindings.Update();
         }
 
@@ -89,8 +89,8 @@ namespace BangumiArchive.UIModule
         {
             IsFiltered = true;
 
-            StaticIndexList = new ObservableCollection<SeriesIndex>(
-                DataManager.SIs.Where(i => CheckSeries(i.Series)));
+            StaticIndices = new ObservableCollection<SeriesIndex>(
+                DataManager.WatchedIdx.Where(i => CheckSeries(i.Series)));
             Bindings.Update();
         }
 
@@ -138,10 +138,10 @@ namespace BangumiArchive.UIModule
 
             // Create new Series
             string name = dialog.Text;
-            SeriesIndex si = DataManager.AddSeries(name);
+            SeriesIndex si = DataManager.AddWatchedSeries(name);
             if (!IsFiltered || CheckSeries(si.Series))
             {
-                IndexList.Add(si);
+                Indices.Add(si);
             }
 
             // Scroll to the new Series
@@ -158,8 +158,8 @@ namespace BangumiArchive.UIModule
         /// <param name="e"></param>
         private void ScrollToTopClick(object sender, RoutedEventArgs e)
         {
-            if (IndexList.Any())
-                SeriesGrid.ScrollIntoView(IndexList[0]);
+            if (Indices.Any())
+                SeriesGrid.ScrollIntoView(Indices[0]);
         }
 
         /// <summary>
