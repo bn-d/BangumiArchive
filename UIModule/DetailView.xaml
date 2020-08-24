@@ -183,15 +183,15 @@
         <FlipView x:Name="SeriesDetail"
                   Background="{x:Null}"
                   VerticalContentAlignment="Top"
-                  ItemsSource="{x:Bind IndexList}"
+                  ItemsSource="{x:Bind Indices}"
                   ItemTemplate="{StaticResource SeriesItem}"/>
 
         <CommandBar Background="{x:Null}" Margin="0,0,20,0" OverflowButtonVisibility="Collapsed">
             <CommandBar.Content>
                 <StackPanel Orientation="Horizontal">
                     <AppBarButton Icon="Back" Label="" VerticalAlignment="Bottom"
-                                  Click="{x:Bind global:MainPage.NavigateMainView}"/>
-                    <AutoSuggestBox Template="{StaticResource SeriesSearchBox}"/>
+                                  Click="BackClick"/>
+                    <AutoSuggestBox x:Name="SeriesSearchBox" Template="{StaticResource SeriesSearchBox}"/>
                 </StackPanel>
             </CommandBar.Content>
 
