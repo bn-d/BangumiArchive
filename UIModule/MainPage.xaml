@@ -1,0 +1,144 @@
+﻿<Page
+    x:Class="BangumiArchive.UIModule.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:global="using:BangumiArchive"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+
+        <!-- Hide the chevron of app bar button -->
+        <StaticResource x:Key="MenuFlyoutSubItemChevron" ResourceKey="SystemControlDisabledTransparentBrush" />
+
+        <DataTemplate x:Key="NotebookItem" x:DataType="global:BangumiNotebook">
+            <StackPanel MinWidth="120" Orientation="Horizontal" Margin="0,5" HorizontalAlignment="Right">
+                <TextBlock Text="{x:Bind Title, Mode=OneWay}" FontSize="16" MinWidth="160"
+                           VerticalAlignment="Center"/>
+                <AppBarButton 
+                    Icon="Rename" Height="40" Width="40"
+                    Click="RenameNotebookClickAsync"
+                    ToolTipService.ToolTip="Rename" ToolTipService.Placement="Bottom"/>
+                <AppBarButton 
+                    Icon="Delete" Height="40" Width="40"
+                    Click="DeleteNotebookClick"
+                    ToolTipService.ToolTip="Delete" ToolTipService.Placement="Bottom"/>
+            </StackPanel>
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Pivot Name="MainPivot">
+            <PivotItem Header="Main" Background="Black">
+                <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled" Background="Black">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid Margin="0" Padding="0" Height="15" Grid.Row="0">
+                        <Grid.Background>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="Black" Offset="1"/>
+                                <GradientStop Color="White"/>
+                            </LinearGradientBrush>
+                        </Grid.Background>
+                    </Grid>
+
+                    <Frame x:Name="MainFrame" Grid.Row="1">
+                        <Frame.Background>
+                            <ImageBrush Stretch="UniformToFill" ImageSource="../Assets/background.png"/>
+                        </Frame.Background>
+                    </Frame>
+                </Grid>
+            </PivotItem>
+
+            <PivotItem Header="ToWatch">
+                <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled" Background="Black">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid Margin="0" Padding="0" Height="15" Grid.Row="0">
+                        <Grid.Background>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="Black" Offset="1"/>
+                                <GradientStop Color="White"/>
+                            </LinearGradientBrush>
+                        </Grid.Background>
+                    </Grid>
+
+                    <Frame x:Name="ToWatchFrame" Grid.Row="1">
+                        <Frame.Background>
+                            <ImageBrush Stretch="UniformToFill" ImageSource="../Assets/background.png"/>
+                        </Frame.Background>
+                    </Frame>
+                </Grid>
+            </PivotItem>
+
+            <PivotItem Header="Schedule">
+                <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled" Background="Black">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid Margin="0" Padding="0" Height="15" Grid.Row="0">
+                        <Grid.Background>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="Black" Offset="1"/>
+                                <GradientStop Color="White"/>
+                            </LinearGradientBrush>
+                        </Grid.Background>
+                    </Grid>
+
+                    <Frame x:Name="ScheduleFrame" Grid.Row="1">
+                        <Frame.Background>
+                            <ImageBrush Stretch="UniformToFill" ImageSource="../Assets/background.png"/>
+                        </Frame.Background>
+                    </Frame>
+                </Grid>
+            </PivotItem>
+
+            <PivotItem Header="Statistics">
+                <Frame x:Name="StatisticsFrame"/>
+            </PivotItem>
+        </Pivot>
+
+        <AppBarButton 
+            Icon="Library" 
+            Height="40"  Margin="0,5,0,0"
+            HorizontalAlignment="Right" VerticalAlignment="Top"
+            ToolTipService.ToolTip="View Notebooks" ToolTipService.Placement="Bottom">
+            <AppBarButton.Flyout>
+                <Flyout Placement="BottomEdgeAlignedLeft" FlyoutPresenterStyle="{StaticResource CompactFlyoutStyle}">
+                    <StackPanel>
+                        <ListView ItemsSource="{x:Bind global:DataManager.Archive}"
+                                  ItemTemplate="{StaticResource NotebookItem}"
+                                  IsItemClickEnabled="True" ItemClick="NotebookItemClick"
+                                  SelectionMode="None"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <AppBarButton 
+                                Icon="Add" Height="40" Width="60"
+                                Click="AddNotebookClickAsync" 
+                                ToolTipService.ToolTip="Add Notebook" ToolTipService.Placement="Bottom"/>
+                            <AppBarButton 
+                                Icon="Import" Height="40" Width="60"
+                                Click="ImportClickasync" 
+                                ToolTipService.ToolTip="Import" ToolTipService.Placement="Bottom"/>
+                            <AppBarButton 
+                                Icon="Import" Height="40"  Width="60" RenderTransformOrigin="0.5,0.5"
+                                Click="{x:Bind global:DataManager.ExportArchive}" 
+                                ToolTipService.ToolTip="Export" ToolTipService.Placement="Bottom">
+                                <AppBarButton.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleX="-1"/>
+                                    </TransformGroup>
+                                </AppBarButton.RenderTransform>
+                            </AppBarButton>
+                        </StackPanel>
+                    </StackPanel>
+                </Flyout>
+            </AppBarButton.Flyout>
+        </AppBarButton>
+    </Grid>
+</Page>

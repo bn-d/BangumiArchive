@@ -30,13 +30,7 @@
                             HorizontalAlignment="Right" VerticalAlignment="Center"
                             MinWidth="50" Background="{x:Null}" BorderBrush="{x:Null}">
                         <Button.Flyout>
-                            <Flyout Placement="Bottom">
-                                <Flyout.FlyoutPresenterStyle>
-                                    <Style TargetType="FlyoutPresenter">
-                                        <Setter Property="Padding" Value="0"/>
-                                        <Setter Property="MinWidth" Value="80"/>
-                                    </Style>
-                                </Flyout.FlyoutPresenterStyle>
+                            <Flyout Placement="Bottom" FlyoutPresenterStyle="{StaticResource CompactFlyoutStyle}">
                                 <ListView ItemsSource="{x:Bind global:ReviewHelper.All}" 
                                           IsItemClickEnabled="True" ItemClick="ChangeRankItemClick"
                                           SelectionMode="None">
@@ -146,30 +140,29 @@
                         VerticalContentAlignment="Bottom" HorizontalContentAlignment="Left" 
                         FontSize="18" Margin="50,0,0,0">
                         <Button.Flyout>
-                            <Flyout Placement="Bottom">
-                                <Flyout.FlyoutPresenterStyle>
-                                    <Style TargetType="FlyoutPresenter">
-                                        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
-                                        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled"/>
-                                    </Style>
-                                </Flyout.FlyoutPresenterStyle>
+                            <Flyout Placement="Bottom" FlyoutPresenterStyle="{StaticResource CompactFlyoutStyle}">
                                 <StackPanel ScrollViewer.VerticalScrollBarVisibility="Disabled">
                                     <ListView ItemsSource="{x:Bind Songs}">
                                         <ListView.ItemTemplate>
                                             <DataTemplate x:DataType="global:Song">
-                                                <TextBox Text="{x:Bind Name, Mode=TwoWay}"
-                                                     Style="{StaticResource TBStyle}"
-                                                     HorizontalContentAlignment="Stretch"
-                                                     LostFocus="{x:Bind local:UIDictionary.TrimText}" MinWidth="200"/>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBox 
+                                                        Text="{x:Bind Name, Mode=TwoWay}"
+                                                        Style="{StaticResource TBStyle}"
+                                                        LostFocus="{x:Bind local:UIDictionary.TrimText}" Width="300"/>
+                                                    <AppBarButton 
+                                                        Icon="Delete" Height="40" Width="40"
+                                                        Click="DeleteSongClick" 
+                                                        ToolTipService.ToolTip="Delete" ToolTipService.Placement="Bottom"/>
+                                                </StackPanel>
                                             </DataTemplate>
                                         </ListView.ItemTemplate>
                                     </ListView>
-                                    <StackPanel Orientation="Horizontal">
-                                        <AppBarButton Icon="Add" Label="Add" Click="AddSongClick" IsCompact="True"
-                                                  VerticalAlignment="Center" HorizontalAlignment="Center" />
-                                        <AppBarButton Icon="Remove" Label="Remove" Click="RemoveSongClick" IsCompact="True"
-                                                  VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                    </StackPanel>
+                                    <AppBarButton 
+                                            Icon="Add" Click="AddSongClick"
+                                            Height="40" Width="60"
+                                            HorizontalAlignment="Right"
+                                            ToolTipService.ToolTip="Add Song" ToolTipService.Placement="Bottom"/>
                                 </StackPanel>
                             </Flyout>
                         </Button.Flyout>
@@ -186,7 +179,7 @@
                   ItemsSource="{x:Bind Indices}"
                   ItemTemplate="{StaticResource SeriesItem}"/>
 
-        <CommandBar Background="{x:Null}" Margin="0,0,20,0" OverflowButtonVisibility="Collapsed">
+        <CommandBar Style="{StaticResource TopCommandBarStyle}">
             <CommandBar.Content>
                 <StackPanel Orientation="Horizontal">
                     <AppBarButton Icon="Back" Label="" VerticalAlignment="Bottom"
@@ -195,8 +188,12 @@
                 </StackPanel>
             </CommandBar.Content>
 
-            <AppBarButton Icon="Add" Label="" Click="AddSeasonClick"/>
-            <AppBarButton Icon="Remove" Label="" Click="RemoveSeasonClick"/>
+            <AppBarButton 
+                Icon="Add" Label="" Click="AddSeasonClick" Width="60"
+                ToolTipService.ToolTip="Add Season" ToolTipService.Placement="Bottom"/>
+            <AppBarButton 
+                Icon="Remove" Label="" Click="RemoveSeasonClick" Width="60"
+                ToolTipService.ToolTip="Remove Season" ToolTipService.Placement="Bottom"/>
             <AppBarButton Template="{StaticResource SaveButton}"/>
         </CommandBar>
     </Grid>

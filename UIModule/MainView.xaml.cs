@@ -28,7 +28,7 @@ namespace BangumiArchive.UIModule
             ReviewChecked = new ObservableCollection<ReviewBoolPair>
                 (ReviewHelper.All.Select(cur => new ReviewBoolPair(cur, true)).ToList());
 
-            ResetIndexList();
+            ResetIndices();
         }
 
         /// <summary>
@@ -59,9 +59,14 @@ namespace BangumiArchive.UIModule
         }
 
         /// <summary>
+        /// Update the main series list
+        /// </summary>
+        public void Refresh() => ResetFilter();
+
+        /// <summary>
         /// Reset the index list to default
         /// </summary>
-        private void ResetIndexList()
+        public void ResetIndices()
         {
             StaticIndices = new ObservableCollection<SeriesIndex>(DataManager.WatchedIdx);
             Bindings.Update();
@@ -79,7 +84,7 @@ namespace BangumiArchive.UIModule
             foreach (ReviewBoolPair r in ReviewChecked) r.Second = true;
             CompanyTB.Text = "";
 
-            ResetIndexList();
+            ResetIndices();
         }
 
         /// <summary>
@@ -131,14 +136,14 @@ namespace BangumiArchive.UIModule
         private async void AddSeriesAsyncClick(object sender, RoutedEventArgs e)
         {
             // Show input dialog to get the new Series name
-            var dialog = new InputDialog();
+            var dialog = new InputDialog("Add Series");
             var result = await dialog.ShowAsync();
 
             if (result != ContentDialogResult.Primary) return;
 
             // Create new Series
             string name = dialog.Text;
-            SeriesIndex si = DataManager.AddWatchedSeries(name);
+            SeriesIndex si = DataManager.Watched.Add(name);
             if (!IsFiltered || CheckSeries(si.Series))
             {
                 Indices.Add(si);
@@ -206,17 +211,6 @@ namespace BangumiArchive.UIModule
 
             if (ReviewChecked.ToList().All(cur => (bool)cur.Second))
                 RankAllCB.IsChecked = true;
-        }
-
-        /// <summary>
-        /// Import from file, if successfully import, refresh grid
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private async void ImportAsynClick(object sender, RoutedEventArgs e)
-        {
-            bool imported = await DataManager.ImportArchive();
-            if (imported) ResetIndexList();
         }
 
         private void SeriesItemClick(object sender, ItemClickEventArgs e) =>

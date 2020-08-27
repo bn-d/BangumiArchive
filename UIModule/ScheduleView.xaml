@@ -13,27 +13,31 @@
 
     <Page.Resources>
         <DataTemplate x:Key="SeriesNameItem" x:DataType="global:SeriesIndex">
-            <TextBlock Text="{x:Bind Series.Title}" FontSize="24"/>
+            <TextBlock Text="{x:Bind Series.Title, Mode=OneWay}" FontSize="24"/>
         </DataTemplate>
 
         <DataTemplate x:Key="DayViewItem" x:DataType="local:DayList">
             <StackPanel Orientation="Vertical" Margin="0,0,100,50" HorizontalAlignment="Left" VerticalAlignment="Top">
-                <TextBlock Text="{x:Bind DayOfWeek}" 
-                           Style="{StaticResource TBTextStyle}" FontSize="36"/>
+                <TextBlock 
+                    Text="{x:Bind DayOfWeek}"  
+                    Style="{StaticResource TBTextStyle}" FontSize="36"/>
                 <Rectangle Height="1" HorizontalAlignment="Stretch" Fill="White"/>
-                <ListView ItemsSource="{x:Bind Series}" 
-                          ItemTemplate="{StaticResource SeriesNameItem}" 
-                          SelectionMode="None" IsItemClickEnabled="True" ItemClick="SeriesItemClick"
-                          Margin="20,0,0,0"/>
+                <ListView 
+                    ItemsSource="{x:Bind Series}" 
+                    ItemTemplate="{StaticResource SeriesNameItem}" 
+                    Margin="20,0,0,0"
+                    SelectionMode="None" IsItemClickEnabled="True" ItemClick="SeriesItemClick"/>
             </StackPanel>
         </DataTemplate>
     </Page.Resources>
 
     <Grid>
-        <ScrollViewer Background="{x:Null}" BorderBrush="{x:Null}" VerticalScrollBarVisibility="Disabled" 
-                      HorizontalScrollBarVisibility="Auto">
-            <ItemsControl ItemsSource="{x:Bind weekList.Days}" ItemTemplate="{StaticResource DayViewItem}" 
-                          HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,50,0,50">
+        <ScrollViewer 
+            Background="{x:Null}" BorderBrush="{x:Null}" VerticalScrollBarVisibility="Disabled" 
+            HorizontalScrollBarVisibility="Auto">
+            <ItemsControl 
+                ItemsSource="{x:Bind weekList.Days}" ItemTemplate="{StaticResource DayViewItem}" 
+                HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,50,0,50">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <controls:WrapPanel Orientation="Vertical"/>
@@ -42,7 +46,10 @@
             </ItemsControl>
         </ScrollViewer>
 
-        <AppBarButton Icon="Refresh" Click="RefreshClick" HorizontalAlignment="Right" 
-                      VerticalContentAlignment="Top" Margin="0,0,20,0"/>
+        <CommandBar Style="{StaticResource TopCommandBarStyle}">
+            <AppBarButton 
+                Icon="Refresh" Click="RefreshClick" Width="60"
+                ToolTipService.ToolTip="Refresh" ToolTipService.Placement="Bottom"/>
+        </CommandBar>
     </Grid>
 </Page>

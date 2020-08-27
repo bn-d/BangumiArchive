@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Windows.ApplicationModel;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -12,7 +13,7 @@ namespace BangumiArchive.UIModule
     /// </summary>
     public sealed partial class StatisticsView : Page
     {
-        private int animeNum;
+        private int seriesNum;
         private TimeSpan totalTime;
         private int watchingNum;
 
@@ -28,20 +29,25 @@ namespace BangumiArchive.UIModule
         private int songNum;
         public static ObservableCollection<string> SongList;
 
+        private string versionStr = string.Format("BangumiArchive {0}.{1}.{2}",
+            Package.Current.Id.Version.Major,
+            Package.Current.Id.Version.Minor,
+            Package.Current.Id.Version.Build);
+
         public StatisticsView()
         {
             InitializeComponent();
             DataContextChanged += (s, e) => Bindings.Update();
 
-            RefreshStatistic();
+            Refresh();
         }
 
         /// <summary>
-        /// Refresh the statistics view info
+        /// Refresh the statistics info
         /// </summary>
-        private void RefreshStatistic()
+        public void Refresh()
         {
-            animeNum = DataManager.WatchedIdx.Count;
+            seriesNum = DataManager.WatchedIdx.Count;
 
             {
                 int totalMin = DataManager.WatchedIdx.Sum(cur =>

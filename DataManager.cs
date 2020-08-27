@@ -35,7 +35,7 @@ namespace BangumiArchive
         public string IndexString => 
             Watched ? (Index + 1).ToString() : "";
         public Series Series => 
-            Watched ? DataManager.Watched[Index] : DataManager.ToWatch[Index];
+            Watched ? DataManager.WatchedSeries[Index] : DataManager.ToWatchSeries[Index];
         public Series S => Series;
 
         public override string ToString() { return Series.Title; }
@@ -44,12 +44,12 @@ namespace BangumiArchive
     /// <summary>
     /// A class for all the global variable
     /// </summary>
-    public static class DataManager 
+    public static class DataManager
     {
         private static string ArchiveFileName = "BangumiArchive.xml";
 
         private static int ArcIndex = 0;
-        private static BangumiArchiveType Archive;
+        internal static BangumiArchiveType Archive;
         private static ObservableCollection<SeriesIndex> WatchedIndices;
         private static ObservableCollection<SeriesIndex> ToWatchIndices;
 
@@ -61,13 +61,14 @@ namespace BangumiArchive
         public static StorageFolder LocalFolder =
             ApplicationData.Current.LocalFolder;
 
-        internal static ObservableCollection<Series> Watched
+        internal static ObservableCollection<Series> WatchedSeries
         {
             get { return Archive[ArcIndex].Watched; }
             set { Archive[ArcIndex].Watched = value; }
         }
+
         public static ObservableCollection<SeriesIndex> WatchedIdx => WatchedIndices;
-        internal static ObservableCollection<Series> ToWatch
+        internal static ObservableCollection<Series> ToWatchSeries
         {
             get { return Archive[ArcIndex].ToWatch; }
             set { Archive[ArcIndex].ToWatch = value; }
@@ -77,70 +78,19 @@ namespace BangumiArchive
         private static HashAlgorithmProvider md5 = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Md5);
 
         /// <summary>
-        /// Add a new series to the watched list
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public static SeriesIndex AddWatchedSeries(string name)
-        {
-            int index = Watched.Count;
-            Watched.Add(new Series(name));
-            WatchedIndices.Add(new SeriesIndex(index, true));
-
-            return WatchedIndices[index];
-        }
-
-        /// <summary>
-        /// Add a new series to the to-watch list
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public static SeriesIndex AddToWatchSeries(string name)
-        {
-            int index = ToWatch.Count;
-            ToWatch.Add(new Series(name));
-            ToWatchIndices.Add(new SeriesIndex(index, false));
-
-            return WatchedIndices[index];
-        }
-
-        /// <summary>
-        /// Move a to-watch series to the watched list
-        /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        public static SeriesIndex MoveToWatchedSeries(int index)
-        {
-            int watchedIndex = Watched.Count;
-
-            Watched.Add(ToWatch[index]);
-            WatchedIndices.Add(new SeriesIndex(watchedIndex, true));
-
-            RemoveToWatchSeries(index);
-            
-            return WatchedIndices[watchedIndex];
-        }
-
-        /// <summary>
-        /// Delete a to-watch series
-        /// </summary>
-        /// <param name="index"></param>
-        public static void RemoveToWatchSeries(int index)
-        {
-            ToWatch.RemoveAt(index);
-            ToWatchIdx.RemoveAt(index);
-            foreach (var si in ToWatchIdx)
-            {
-                if (si.Index > index) { si.Index -= 1; }
-            }
-        }
-
-        /// <summary>
         /// Initialize all the required data
         /// </summary>
         public static async Task InitializeData()
         {
             await ReadDataFromLocal();
+            ResetAll();
+        }
+
+        /// <summary>
+        /// Reset all temporary data
+        /// </summary>
+        public static void ResetAll()
+        {
             ResetSeriesIndices();
             SetCompanyList();
         }
@@ -152,6 +102,73 @@ namespace BangumiArchive
         {
             WriteDataToLocal();
             SetCompanyList();
+        }
+
+        /// <summary>
+        /// Create a set of all the company
+        /// </summary>
+        public static void SetCompanyList()
+        {
+            CompanyHashSet = new HashSet<string>();
+            foreach (Series a in WatchedSeries)
+            {
+                foreach (Season s in a.Seasons)
+                {
+                    CompanyHashSet.Add(s.Company);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Check whether data have changed since last saving
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsDataChanged()
+        {
+            string curHash = ComputeHash();
+            if (!SeriesListHash.Equals(curHash))
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Reset the index list
+        /// </summary>
+        private static void ResetSeriesIndices()
+        {
+            WatchedIndices = new ObservableCollection<SeriesIndex>(
+                Enumerable.Range(0, WatchedSeries.Count).Select(i => new SeriesIndex(i, true)));
+            ToWatchIndices = new ObservableCollection<SeriesIndex>(
+                Enumerable.Range(0, ToWatchSeries.Count).Select(i => new SeriesIndex(i, false)));
+        }
+
+        /// <summary>
+        /// Compute the hash of an object
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns> 
+        // Reference: https://alexmg.com/posts/compute-any-hash-for-any-object-in-c
+        private static string ComputeHash()
+        {
+            DataContractSerializer serializer = new DataContractSerializer(typeof(BangumiArchiveType));
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                serializer.WriteObject(memoryStream, Archive);
+                return ComputeStreamHash(memoryStream);
+            }
+        }
+
+        /// <summary>
+        /// Compute the hash of a memory stream
+        /// </summary>
+        /// <param name="memoryStream"></param>
+        /// <returns></returns>
+        private static string ComputeStreamHash(MemoryStream memoryStream)
+        {
+            memoryStream.Position = 0;
+            IBuffer buffHash = md5.HashData(memoryStream.GetWindowsRuntimeBuffer());
+            return CryptographicBuffer.EncodeToBase64String(buffHash);
         }
 
         /// <summary>
@@ -196,8 +213,10 @@ namespace BangumiArchive
             }
             catch (Exception)
             {
-                Archive = new BangumiArchiveType();
-                Archive.Add(new BangumiNotebook("First Notebook"));
+                Archive = new BangumiArchiveType
+                {
+                    new BangumiNotebook("New Notebook")
+                };
                 return false;
             }
             return true;
@@ -277,71 +296,132 @@ namespace BangumiArchive
             return true;
         }
 
-        /// <summary>
-        /// Create a set of all the company
-        /// </summary>
-        public static void SetCompanyList()
+        public class Notebook
         {
-            DataManager.CompanyHashSet = new HashSet<string>();
-            foreach (Series a in Watched)
+            /// <summary>
+            /// Add a new Notebook
+            /// </summary>
+            /// <param name="name"></param>
+            public static void Add(string name)
             {
-                foreach (Season s in a.Seasons)
+                Archive.Add(new BangumiNotebook(name));
+                Change(Archive.Count - 1);
+            }
+
+            /// <summary>
+            /// Remove the selected Notebook
+            /// </summary>
+            /// <param name="dataContext"></param>
+            public static bool Remove(BangumiNotebook notebook)
+            {
+                int index = Archive.ToList().FindIndex(cur => cur == notebook);
+
+                // Add new notebook if this is the last one
+                if (Archive.Count <= 1)
                 {
-                    CompanyHashSet.Add(s.Company);
+                    Archive.Add(new BangumiNotebook("New Notebook"));
+                }
+
+                Archive.RemoveAt(index);
+                if (index == ArcIndex)
+                {
+                    ArcIndex = 0;
+                    ResetAll();
+                    return true;
+                }
+                else if (index < ArcIndex)
+                {
+                    ArcIndex -= 1;
+                }
+                return false;
+            }
+
+            /// <summary>
+            /// Change the current Notebook
+            /// </summary>
+            /// <param name="notebook"></param>
+            public static bool Change(BangumiNotebook notebook)
+            {
+                return Change(Archive.ToList().FindIndex(cur => cur == notebook));
+            }
+
+            /// <summary>
+            /// Change the current Notebook
+            /// </summary>
+            /// <param name="clickedItem"></param>
+            public static bool Change(int index)
+            {
+                if (ArcIndex == index) return false;
+
+                ArcIndex = index;
+                ResetAll();
+                return true;
+            }
+        }
+
+        public class Watched
+        {
+            /// <summary>
+            /// Add a new series to the watched list
+            /// </summary>
+            /// <param name="name"></param>
+            /// <returns></returns>
+            public static SeriesIndex Add(string name)
+            {
+                int index = WatchedSeries.Count;
+                WatchedSeries.Add(new Series(name));
+                WatchedIndices.Add(new SeriesIndex(index, true));
+
+                return WatchedIndices[index];
+            }
+        }
+
+        public class ToWatch
+        {
+            /// <summary>
+            /// Add a new series to the to-watch list
+            /// </summary>
+            /// <param name="name"></param>
+            /// <returns></returns>
+            public static SeriesIndex Add(string name)
+            {
+                int index = ToWatchSeries.Count;
+                ToWatchSeries.Add(new Series(name));
+                ToWatchIndices.Add(new SeriesIndex(index, false));
+
+                return WatchedIndices[index];
+            }
+
+            /// <summary>
+            /// Move the selected to-watch series to the watched list
+            /// </summary>
+            /// <param name="index"></param>
+            /// <returns></returns>
+            public static SeriesIndex MoveToWatched(int index)
+            {
+                int watchedIndex = WatchedSeries.Count;
+
+                WatchedSeries.Add(ToWatchSeries[index]);
+                WatchedIndices.Add(new SeriesIndex(watchedIndex, true));
+
+                Remove(index);
+
+                return WatchedIndices[watchedIndex];
+            }
+
+            /// <summary>
+            /// Remove the selected to-watch series
+            /// </summary>
+            /// <param name="index"></param>
+            public static void Remove(int index)
+            {
+                ToWatchSeries.RemoveAt(index);
+                ToWatchIdx.RemoveAt(index);
+                foreach (var si in ToWatchIdx)
+                {
+                    if (si.Index > index) { si.Index -= 1; }
                 }
             }
-        }
-
-        /// <summary>
-        /// Check whether data have changed since last saving
-        /// </summary>
-        /// <returns></returns>
-        public static bool IsDataChanged()
-        {
-            string curHash = ComputeHash();
-            if (!SeriesListHash.Equals(curHash))
-                return true;
-
-            return false;
-        }
-
-        /// <summary>
-        /// Reset the index list
-        /// </summary>
-        private static void ResetSeriesIndices()
-        {
-            WatchedIndices = new ObservableCollection<SeriesIndex>(
-                Enumerable.Range(0, Watched.Count).Select(i => new SeriesIndex(i, true)));
-            ToWatchIndices = new ObservableCollection<SeriesIndex>(
-                Enumerable.Range(0, ToWatch.Count).Select(i => new SeriesIndex(i, false)));
-        }
-
-        /// <summary>
-        /// Compute the hash of an object
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns> 
-        // Reference: https://alexmg.com/posts/compute-any-hash-for-any-object-in-c
-        private static string ComputeHash()
-        {
-            DataContractSerializer serializer = new DataContractSerializer(typeof(BangumiArchiveType));
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                serializer.WriteObject(memoryStream, Archive);
-                return ComputeStreamHash(memoryStream);
-            }
-        }
-
-        /// <summary>
-        /// Compute the hash of a memory stream
-        /// </summary>
-        /// <param name="memoryStream"></param>
-        /// <returns></returns>
-        private static string ComputeStreamHash(MemoryStream memoryStream)
-        {
-            memoryStream.Position = 0;
-            IBuffer buffHash = md5.HashData(memoryStream.GetWindowsRuntimeBuffer());
-            return CryptographicBuffer.EncodeToBase64String(buffHash);
         }
 
     }

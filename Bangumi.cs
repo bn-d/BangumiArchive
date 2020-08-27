@@ -15,10 +15,19 @@ namespace BangumiArchive
     /// The data structure that holds each Bangumi item 
     /// </summary>
     [DataContract]
-    public class BangumiNotebook
+    public class BangumiNotebook : INotifyPropertyChanged
     {
         [DataMember]
-        internal string Title;
+        internal string Title 
+        { 
+            get { return title; }
+            set { 
+                title = value;
+                OnPropertyChanged("Title");
+            }
+        }
+        private string title;
+
         [DataMember]
         internal ObservableCollection<Series> Watched;
         [DataMember]
@@ -30,18 +39,45 @@ namespace BangumiArchive
             Watched = new ObservableCollection<Series>();
             ToWatch = new ObservableCollection<Series>();
         }
+
+        internal void OnPropertyChanged(string name)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 
     /// <summary>
-    /// Anime class that contains the index, name and other information of an anime 
+    /// Series class
     /// </summary>
     [DataContract]
     public class Series : INotifyPropertyChanged
     {
         [DataMember]
-        public string Title;
+        public string Title
+        {
+            get { return title; }
+            set
+            {
+                title = value;
+                OnPropertyChanged("Title");
+            }
+        }
+        private string title;
+
         [DataMember]
-        internal string SubTitle;
+        internal string SubTitle
+        {
+            get { return subtitle; }
+            set
+            {
+                subtitle = value;
+                OnPropertyChanged("SubTitle");
+            }
+        }
+        private string subtitle;
+
         [DataMember]
         private int Rank;
         internal Review Review { 
@@ -52,6 +88,7 @@ namespace BangumiArchive
                 OnPropertyChanged("Review");
             } 
         }
+
         [DataMember]
         internal ObservableCollection<Season> Seasons;
         [DataMember]
@@ -172,7 +209,7 @@ namespace BangumiArchive
     }
 
     /// <summary>
-    /// Season class that contains the information of a season
+    /// Season class
     /// </summary>
     [DataContract]
     internal class Season

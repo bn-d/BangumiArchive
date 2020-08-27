@@ -17,7 +17,7 @@ namespace BangumiArchive.UIModule
     public sealed partial class DetailView : Page
     {
         private bool Watched;
-        private ObservableCollection<SeriesIndex> Indices => 
+        private ObservableCollection<SeriesIndex> Indices =>
             Watched ? DataManager.WatchedIdx : DataManager.ToWatchIdx;
         private SeriesIndex Index => Indices[SeriesDetail.SelectedIndex];
         private Series Series => Index.Series;
@@ -68,26 +68,28 @@ namespace BangumiArchive.UIModule
         /// <param name="e"></param>
         private void AddSongClick(object sender, RoutedEventArgs e)
         {
-            StackPanel parent = (StackPanel)VisualTreeHelper.GetParent(
-                VisualTreeHelper.GetParent((AppBarButton)sender));
-            ListView songList = (ListView)VisualTreeHelper.GetChild(parent, 0);
-            ObservableCollection<Song> songs = (ObservableCollection<Song>)songList.ItemsSource;
-            songs.Add(new Song());
+            AppBarButton button = (AppBarButton)sender;
+            Season s = (Season)button.DataContext;
+            s.Songs.Add(new Song());
         }
 
         /// <summary>
-        /// Remove the last song, if the list is not empty
+        /// Delete the current song
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void RemoveSongClick(object sender, RoutedEventArgs e)
+        private void DeleteSongClick(object sender, RoutedEventArgs e)
         {
-            StackPanel parent = (StackPanel)VisualTreeHelper.GetParent(
-                VisualTreeHelper.GetParent((AppBarButton)sender));
-            ListView songList = (ListView)VisualTreeHelper.GetChild(parent, 0);
-            ObservableCollection<Song> songs = (ObservableCollection<Song>)songList.ItemsSource;
-            if (songs.Any())
-                songs.RemoveAt(songs.Count - 1);
+            AppBarButton button = (AppBarButton)sender;
+            Song song = (Song)button.DataContext;
+
+            ItemsStackPanel parent = (ItemsStackPanel)VisualTreeHelper.GetParent(
+                VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(
+                VisualTreeHelper.GetParent((AppBarButton)sender))));
+            Season s = (Season)parent.DataContext;
+
+            int index = s.Songs.ToList().FindIndex(cur => cur == song);
+            s.Songs.RemoveAt(index);
         }
 
         /// <summary>
