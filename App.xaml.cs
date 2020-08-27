@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BangumiArchive.UIModule;
+using System;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.Core.Preview;

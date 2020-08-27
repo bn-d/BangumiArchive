@@ -9,9 +9,17 @@ namespace BangumiArchive.UIModule
     {
         public string Text;
 
-        public InputDialog()
+        public InputDialog(string message)
         {
-            this.InitializeComponent();
+            InitializeComponent();
+            Title = message;
+        }
+
+        public InputDialog(string message, string text)
+        {
+            InitializeComponent();
+            Title = message;
+            Inbox.Text = text;
         }
 
         /// <summary>

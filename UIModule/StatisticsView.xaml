@@ -21,7 +21,7 @@
         <ScrollViewer Background="{x:Null}" BorderBrush="{x:Null}">
             <StackPanel Padding="100,50" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock Margin="0,50,0,0" FontSize="24">
-                    <Run Text="{x:Bind animeNum}"/>
+                    <Run Text="{x:Bind seriesNum}"/>
                     <Run>  watched in total with a total time of  </Run>
                     <Run Text="{x:Bind totalTime}"/>
                 </TextBlock>
@@ -54,9 +54,15 @@
                     <Run>  OP/ED songs added to the list</Run>
                 </TextBlock>
                 <Button Content="See All" Click="SongClick" Margin="20,0,0,0"/>
+
+                <TextBlock Text="{x:Bind versionStr}" HorizontalAlignment="Center" Margin="0,100,0,0"/>
             </StackPanel>
         </ScrollViewer>
 
-        <AppBarButton Icon="Refresh" Click="{x:Bind RefreshStatistic}" HorizontalAlignment="Right" VerticalContentAlignment="Top" Margin="0,0,20,0"/>
+        <CommandBar Style="{StaticResource TopCommandBarStyle}">
+            <AppBarButton 
+                Icon="Refresh" Click="{x:Bind Refresh}" Width="60"
+                ToolTipService.ToolTip="Refresh" ToolTipService.Placement="Bottom"/>
+        </CommandBar>
     </Grid>
 </Page>

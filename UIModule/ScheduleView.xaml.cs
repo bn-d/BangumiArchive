@@ -19,13 +19,13 @@ namespace BangumiArchive.UIModule
             DataContextChanged += (s, e) => Bindings.Update();
 
             weekList = new WeekList();
-            RefreshWeeklyView();
+            Refresh();
         }
 
         /// <summary>
         /// Update the schedule info
         /// </summary>
-        private void RefreshWeeklyView()
+        public void Refresh()
         {
             weekList.Clear();
 
@@ -45,7 +45,7 @@ namespace BangumiArchive.UIModule
         /// <param name="e"></param>
         private void RefreshClick(object sender, RoutedEventArgs e)
         {
-            RefreshWeeklyView();
+            Refresh();
             Bindings.Update();
         }
 

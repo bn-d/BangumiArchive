@@ -16,6 +16,15 @@ namespace BangumiArchive.UIModule
         }
 
         /// <summary>
+        /// Update the to-watch series list
+        /// </summary>
+        public void Refresh()
+        {
+            ToWatchGrid.ItemsSource = null;
+            ToWatchGrid.ItemsSource = DataManager.ToWatchIdx;
+        }
+
+        /// <summary>
         /// Add new series to to-watch list
         /// </summary>
         /// <param name="sender"></param>
@@ -23,14 +32,14 @@ namespace BangumiArchive.UIModule
         private async void AddToWatchClickAsync(object sender, RoutedEventArgs e)
         {
             // Show input dialog to get the new Series name
-            var dialog = new InputDialog();
+            var dialog = new InputDialog("Add To-Watch Series");
             var result = await dialog.ShowAsync();
 
             if (result != ContentDialogResult.Primary) return;
 
             // Create new Series
             string name = dialog.Text;
-            SeriesIndex si = DataManager.AddToWatchSeries(name);
+            DataManager.ToWatch.Add(name);
         }
 
         /// <summary>
@@ -42,7 +51,7 @@ namespace BangumiArchive.UIModule
         {
             AppBarButton button = (AppBarButton)sender;
             SeriesIndex idx = (SeriesIndex)button.DataContext;
-            var si = DataManager.MoveToWatchedSeries(idx.Index);
+            var si = DataManager.ToWatch.MoveToWatched(idx.Index);
             if (!MainView.IsFiltered)
             {
                 MainView.StaticIndices.Add(si);
@@ -60,7 +69,7 @@ namespace BangumiArchive.UIModule
         {
             AppBarButton button = (AppBarButton)sender;
             SeriesIndex idx = (SeriesIndex)button.DataContext;
-            DataManager.RemoveToWatchSeries(idx.Index);
+            DataManager.ToWatch.Remove(idx.Index);
         }
 
         private void ToWatchItemClick(object sender, ItemClickEventArgs e) =>
