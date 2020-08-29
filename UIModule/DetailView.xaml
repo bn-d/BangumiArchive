@@ -12,7 +12,7 @@
 
     <Page.Resources>
         <DataTemplate x:Key="SeriesItem" x:DataType="global:SeriesIndex">
-            <Grid Margin="0,50,0,0" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+            <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -73,9 +73,15 @@
                 <StackPanel Orientation="Horizontal" 
                             VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,0,0,20" Grid.Row="1">
                     <CheckBox IsChecked="{x:Bind Series.IsWatchingNullable, Mode=TwoWay}"
-                              Content="Watching" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                              Content="Watching"/>
                     <CheckBox IsChecked="{x:Bind Series.IsLiveNullable, Mode=TwoWay}"
-                              Content="Live" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                              Content="Live" MinWidth="80"/>
+                    <AppBarButton 
+                        Icon="Add" Label="" Click="AddSeasonClick" Height="40" Width="40"
+                        ToolTipService.ToolTip="Add Season" ToolTipService.Placement="Bottom"/>
+                    <AppBarButton 
+                        Icon="Remove" Label="" Click="RemoveSeasonClick" Height="40" Width="40"
+                        ToolTipService.ToolTip="Remove Season" ToolTipService.Placement="Bottom"/>
                 </StackPanel>
 
                 <ScrollViewer HorizontalAlignment="Center" 
@@ -87,8 +93,8 @@
             </Grid>
         </DataTemplate>
         
-        <DataTemplate x:Key="SeasonItem" x:DataType="global:Season">
-            <StackPanel>
+        <DataTemplate x:Key="SeasonItem" x:DataType="global:Season" >
+            <StackPanel Margin="0,5">
                 <StackPanel Orientation="Horizontal">
                     <TextBox Text="{x:Bind SeasonTitle, Mode=TwoWay}" 
                              Style="{StaticResource TBStyle}"
@@ -110,37 +116,42 @@
                                         DateFormat="{}{month.abbreviated} {day.integer}, {year.full}"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <TextBox Text="{x:Bind Episode, Mode=TwoWay}"
-                         Style="{StaticResource TBStyle}"
-                         KeyDown="{x:Bind local:UIDictionary.OnlyDigitKeyDown}"
-                         TextAlignment="Right" Margin="50,0,0,0"/>
-                    <TextBlock Text=" Episodes + "
+                    <TextBox 
+                        Text="{x:Bind Episode, Mode=TwoWay}"
+                        Style="{StaticResource TBStyle}"
+                        BeforeTextChanging="{x:Bind local:UIDictionary.OnlyDigitBeforeTextChanging}"
+                        TextAlignment="Right" Margin="50,0,0,0"/>
+                    <TextBlock Text=" Episodes   + "
                                Style="{StaticResource TBTextStyle}"/>
-                    <TextBox Text="{x:Bind Extra, Mode=TwoWay}" 
-                         Style="{StaticResource TBStyle}"
-                         KeyDown="{x:Bind local:UIDictionary.OnlyDigitKeyDown}"
-                         TextAlignment="Right" MinWidth="32"/>
+                    <TextBox 
+                        Text="{x:Bind Extra, Mode=TwoWay}" 
+                        Style="{StaticResource TBStyle}"
+                        BeforeTextChanging="{x:Bind local:UIDictionary.OnlyDigitBeforeTextChanging}"
+                        TextAlignment="Right" Width="40"/>
                     <TextBlock Text=" Extra"
                                Style="{StaticResource TBTextStyle}"/>
-                    <TextBox Text="{x:Bind Length, Mode=TwoWay}"
-                         Style="{StaticResource TBStyle}"
-                         KeyDown="{x:Bind local:UIDictionary.OnlyDigitKeyDown}"
-                         TextAlignment="Right" Margin="50,0,0,0"/>
-                    <TextBlock Text=" Mins per Episodes x "
+                    <TextBox 
+                        Text="{x:Bind Length, Mode=TwoWay}"
+                        Style="{StaticResource TBStyle}"
+                        BeforeTextChanging="{x:Bind local:UIDictionary.OnlyDigitBeforeTextChanging}"
+                        TextAlignment="Right" Margin="20,0,0,0"/>
+                    <TextBlock Text=" Mins per Episodes   x "
                                Style="{StaticResource TBTextStyle}"/>
-                    <TextBox Text="{x:Bind Time, Mode=TwoWay}"
-                         Style="{StaticResource TBStyle}"
-                         KeyDown="{x:Bind local:UIDictionary.OnlyDigitKeyDown}"
-                         TextAlignment="Right"  MinWidth="32"/>
-                    <TextBlock Text=" Times"
-                           Style="{StaticResource TBTextStyle}"/>
+                    <TextBox 
+                        Text="{x:Bind Time, Mode=TwoWay}"
+                        Style="{StaticResource TBStyle}"
+                        BeforeTextChanging="{x:Bind local:UIDictionary.OnlyDigitBeforeTextChanging}"
+                        TextAlignment="Right"  Width="40"/>
+                    <TextBlock 
+                        Text=" Times"
+                        Style="{StaticResource TBTextStyle}"/>
                     <Button Content="Song"
                         Background="{x:Null}" BorderBrush="{x:Null}"
                         VerticalAlignment="Bottom" HorizontalAlignment="Left" 
                         VerticalContentAlignment="Bottom" HorizontalContentAlignment="Left" 
-                        FontSize="18" Margin="50,0,0,0">
+                        FontSize="18" Margin="40,0,0,0">
                         <Button.Flyout>
-                            <Flyout Placement="Bottom" FlyoutPresenterStyle="{StaticResource CompactFlyoutStyle}">
+                            <Flyout Placement="BottomEdgeAlignedRight" FlyoutPresenterStyle="{StaticResource CompactFlyoutStyle}">
                                 <StackPanel ScrollViewer.VerticalScrollBarVisibility="Disabled">
                                     <ListView ItemsSource="{x:Bind Songs}">
                                         <ListView.ItemTemplate>
@@ -173,13 +184,17 @@
     </Page.Resources>
 
     <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
         <FlipView x:Name="SeriesDetail"
                   Background="{x:Null}"
                   VerticalContentAlignment="Top"
                   ItemsSource="{x:Bind Indices}"
-                  ItemTemplate="{StaticResource SeriesItem}"/>
+                  ItemTemplate="{StaticResource SeriesItem}" Grid.Row="1"/>
 
-        <CommandBar Style="{StaticResource TopCommandBarStyle}">
+        <CommandBar Style="{StaticResource TopCommandBarStyle}" Grid.Row="0">
             <CommandBar.Content>
                 <StackPanel Orientation="Horizontal">
                     <AppBarButton Icon="Back" Label="" VerticalAlignment="Bottom"
@@ -189,11 +204,8 @@
             </CommandBar.Content>
 
             <AppBarButton 
-                Icon="Add" Label="" Click="AddSeasonClick" Width="60"
-                ToolTipService.ToolTip="Add Season" ToolTipService.Placement="Bottom"/>
-            <AppBarButton 
-                Icon="Remove" Label="" Click="RemoveSeasonClick" Width="60"
-                ToolTipService.ToolTip="Remove Season" ToolTipService.Placement="Bottom"/>
+                    Icon="Add" Click="AddSeriesClick" Width="60"
+                    ToolTipService.ToolTip="Add Series" ToolTipService.Placement="Bottom"/>
             <AppBarButton Template="{StaticResource SaveButton}"/>
         </CommandBar>
     </Grid>

@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:global="using:BangumiArchive"
+    xmlns:local="using:BangumiArchive.UIModule"
     mc:Ignorable="d"
     RequestedTheme="Dark"
     NavigationCacheMode="Enabled">
@@ -14,7 +15,8 @@
             <StackPanel 
                 Orientation="Horizontal" 
                 Margin="30,10" Width="450"
-                HorizontalAlignment="Stretch" VerticalAlignment="Top" >
+                HorizontalAlignment="Stretch" VerticalAlignment="Top"
+                ToolTipService.ToolTip="{x:Bind Series.Title}" ToolTipService.Placement="Bottom">
                 <Image 
                     Source="{x:Bind Series.Flag, Mode=OneWay}" 
                     Height="30" Width="30" HorizontalAlignment="Left"
@@ -48,15 +50,18 @@
     </Page.Resources>
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
         <GridView
             x:Name="ToWatchGrid"
             VerticalAlignment="Stretch"
             HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
-            Padding="0,50"
             IsItemClickEnabled="True" ItemClick="ToWatchItemClick"
             SelectionMode="None"
             ItemsSource="{x:Bind global:DataManager.ToWatchIdx}"
-            ItemTemplate="{StaticResource ToWatchItem}">
+            ItemTemplate="{StaticResource ToWatchItem}" Grid.Row="1">
             <GridView.ItemsPanel>
                 <ItemsPanelTemplate>
                     <ItemsWrapGrid Orientation="Horizontal" HorizontalAlignment="Center"/>
@@ -64,9 +69,9 @@
             </GridView.ItemsPanel>
         </GridView>
 
-        <CommandBar Style="{StaticResource TopCommandBarStyle}">
+        <CommandBar Style="{StaticResource TopCommandBarStyle}" Grid.Row="0">
             <AppBarButton 
-                Icon="Add" Click="AddToWatchClickAsync" Width="60"
+                Icon="Add" Click="{x:Bind local:ToWatchView.AddToWatchClickAsync}" Width="60"
                 ToolTipService.ToolTip="Add To-Watch Series" ToolTipService.Placement="Bottom"/>
             <AppBarButton Template="{StaticResource SaveButton}"/>
         </CommandBar>

@@ -74,15 +74,18 @@
             </StackPanel>
         </SplitView.Pane>
 
-        <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
             <GridView x:Name="SeriesGrid"
                       VerticalAlignment="Stretch" 
                       HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
-                      Padding="0,50"
                       IsItemClickEnabled="True" ItemClick="SeriesItemClick"
                       SelectionMode="None"
                       ItemsSource="{x:Bind Indices}"
-                      ItemTemplate="{StaticResource WatchedItem}">
+                      ItemTemplate="{StaticResource WatchedItem}" Grid.Row="1">
                 <GridView.ItemsPanel>
                     <ItemsPanelTemplate>
                         <ItemsWrapGrid Orientation="Horizontal" HorizontalAlignment="Center"/>
@@ -90,7 +93,7 @@
                 </GridView.ItemsPanel>
             </GridView>
 
-            <CommandBar Style="{StaticResource TopCommandBarStyle}">
+            <CommandBar Style="{StaticResource TopCommandBarStyle}" Grid.Row="0">
                 <CommandBar.Content>
                     <StackPanel Orientation="Horizontal">
                         <AppBarButton Icon="Filter" Click="ChangeFilterSplitViewClick"/>
@@ -102,7 +105,7 @@
                     Icon="Up" Click="ScrollToTopClick" Width="60"
                     ToolTipService.ToolTip="Scroll to Top" ToolTipService.Placement="Bottom"/>
                 <AppBarButton 
-                    Icon="Add" Click="AddSeriesAsyncClick" Width="60"
+                    Icon="Add" Click="{x:Bind local:MainView.AddSeriesClickAsync}" Width="60"
                     ToolTipService.ToolTip="Add Series" ToolTipService.Placement="Bottom"/>
                 <AppBarButton Template="{StaticResource SaveButton}"/>
             </CommandBar>

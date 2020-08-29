@@ -6,7 +6,6 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Runtime.Serialization;
 using Windows.Storage.Streams;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media.Imaging;
 
 namespace BangumiArchive
@@ -18,10 +17,11 @@ namespace BangumiArchive
     public class BangumiNotebook : INotifyPropertyChanged
     {
         [DataMember]
-        internal string Title 
-        { 
+        internal string Title
+        {
             get { return title; }
-            set { 
+            set
+            {
                 title = value;
                 OnPropertyChanged("Title");
             }
@@ -80,13 +80,14 @@ namespace BangumiArchive
 
         [DataMember]
         private int Rank;
-        internal Review Review { 
-            get { return (Review)Rank; } 
-            set 
-            { 
+        internal Review Review
+        {
+            get { return (Review)Rank; }
+            set
+            {
                 Rank = (int)value;
                 OnPropertyChanged("Review");
-            } 
+            }
         }
 
         [DataMember]
@@ -142,17 +143,15 @@ namespace BangumiArchive
         /// <summary>
         /// Convert byte[] to bitmap image
         /// </summary>
-        private async void ByteToBitmap()
+        private void ByteToBitmap()
         {
 
             if (_flag == null)
                 _flag = new BitmapImage();
-            using (InMemoryRandomAccessStream stream = new InMemoryRandomAccessStream())
-            {
-                await stream.WriteAsync(FlagByte.AsBuffer());
-                stream.Seek(0);
-                await _flag.SetSourceAsync(stream);
-            }
+            using InMemoryRandomAccessStream stream = new InMemoryRandomAccessStream();
+            _ = stream.WriteAsync(FlagByte.AsBuffer());
+            stream.Seek(0);
+            _ = _flag.SetSourceAsync(stream);
         }
 
         internal void OnPropertyChanged(string name)
@@ -195,7 +194,7 @@ namespace BangumiArchive
         }
 
         public static Review FromString(string s)
-        { 
+        {
             return s switch
             {
                 "Rank 5" => Review.Rank5,
@@ -230,7 +229,7 @@ namespace BangumiArchive
             Company = "";
             Songs = new ObservableCollection<Song>();
             Extra = 0;
-            Time = 1;
+            Time = 0;
             Episode = 12;
             Length = 24;
         }

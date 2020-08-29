@@ -26,15 +26,15 @@ namespace BangumiArchive
         public int Index;
         public bool Watched;
 
-        public SeriesIndex(int index, bool watched) 
-        { 
+        public SeriesIndex(int index, bool watched)
+        {
             Index = index;
             Watched = watched;
         }
 
-        public string IndexString => 
+        public string IndexString =>
             Watched ? (Index + 1).ToString() : "";
-        public Series Series => 
+        public Series Series =>
             Watched ? DataManager.WatchedSeries[Index] : DataManager.ToWatchSeries[Index];
         public Series S => Series;
 
@@ -281,7 +281,7 @@ namespace BangumiArchive
                     DataContractSerializer deserializer = new DataContractSerializer(typeof(BangumiArchiveType));
                     Archive = (BangumiArchiveType)deserializer.ReadObject(stream);
 
-                    var dialog = new MessageDialog(string.Format("{0} Bangumi Notebook successfully imported", 
+                    var dialog = new MessageDialog(string.Format("{0} Bangumi Notebook successfully imported",
                         Archive.Count), "Import succeeded");
                     await dialog.ShowAsync();
                 }

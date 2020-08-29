@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.Linq;
 using Windows.Storage;
 using Windows.Storage.Pickers;
@@ -19,8 +20,6 @@ namespace BangumiArchive.UIModule
         private bool Watched;
         private ObservableCollection<SeriesIndex> Indices =>
             Watched ? DataManager.WatchedIdx : DataManager.ToWatchIdx;
-        private SeriesIndex Index => Indices[SeriesDetail.SelectedIndex];
-        private Series Series => Index.Series;
 
         public DetailView()
         {
@@ -47,7 +46,9 @@ namespace BangumiArchive.UIModule
         /// <param name="e"></param>
         private void AddSeasonClick(object sender, RoutedEventArgs e)
         {
-            Series.Seasons.Add(new Season());
+            AppBarButton button = (AppBarButton)sender;
+            SeriesIndex si = (SeriesIndex)button.DataContext;
+            si.Series.Seasons.Add(new Season());
         }
 
         /// <summary>
@@ -57,8 +58,10 @@ namespace BangumiArchive.UIModule
         /// <param name="e"></param>
         private void RemoveSeasonClick(object sender, RoutedEventArgs e)
         {
-            if (Series.Seasons.Any())
-                Series.Seasons.RemoveAt(Series.Seasons.Count - 1);
+            AppBarButton button = (AppBarButton)sender;
+            SeriesIndex si = (SeriesIndex)button.DataContext;
+            if (si.Series.Seasons.Any())
+                si.Series.Seasons.RemoveAt(si.Series.Seasons.Count - 1);
         }
 
         /// <summary>
@@ -99,7 +102,9 @@ namespace BangumiArchive.UIModule
         /// <param name="e"></param>
         private void ChangeRankItemClick(object sender, ItemClickEventArgs e)
         {
-            Series.Review = (Review)e.ClickedItem;
+            ListView button = (ListView)sender;
+            SeriesIndex si = (SeriesIndex)button.DataContext;
+            si.Series.Review = (Review)e.ClickedItem;
         }
 
         /// <summary>
@@ -109,6 +114,9 @@ namespace BangumiArchive.UIModule
         /// <param name="e"></param>
         private async void ChangeFlagClick(object sender, RoutedEventArgs e)
         {
+            Button button = (Button)sender;
+            SeriesIndex si = (SeriesIndex)button.DataContext;
+
             // Load the flag of the Series through file picker
             FileOpenPicker openPicker = new FileOpenPicker
             {
@@ -124,10 +132,27 @@ namespace BangumiArchive.UIModule
             IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.Read);
             DataReader reader = new DataReader(stream.GetInputStreamAt(0));
             await reader.LoadAsync((uint)stream.Size);
-            Series.FlagByte = new byte[stream.Size];
-            reader.ReadBytes(Series.FlagByte);
+            si.Series.FlagByte = new byte[stream.Size];
+            reader.ReadBytes(si.Series.FlagByte);
 
-            Series.OnPropertyChanged("Flag");
+            si.Series.OnPropertyChanged("Flag");
+        }
+
+        /// <summary>
+        /// Dispatch add series click
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddSeriesClick(object sender, RoutedEventArgs e)
+        {
+            if (Watched)
+            {
+                MainView.AddSeriesClickAsync();
+            }
+            else
+            {
+                ToWatchView.AddToWatchClickAsync();
+            }
         }
 
         /// <summary>

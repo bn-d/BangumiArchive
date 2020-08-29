@@ -131,9 +131,7 @@ namespace BangumiArchive.UIModule
         /// <summary>
         /// Add new series
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private async void AddSeriesAsyncClick(object sender, RoutedEventArgs e)
+        public static async void AddSeriesClickAsync()
         {
             // Show input dialog to get the new Series name
             var dialog = new InputDialog("Add Series");
@@ -142,17 +140,12 @@ namespace BangumiArchive.UIModule
             if (result != ContentDialogResult.Primary) return;
 
             // Create new Series
-            string name = dialog.Text;
-            SeriesIndex si = DataManager.Watched.Add(name);
-            if (!IsFiltered || CheckSeries(si.Series))
+            SeriesIndex si = DataManager.Watched.Add(dialog.Text);
+            if (!IsFiltered)
             {
-                Indices.Add(si);
+                StaticIndices.Add(si);
             }
 
-            // Scroll to the new Series
-            SeriesGrid.ScrollIntoView(si);
-
-            // Display the Series' details
             MainPage.NavigateDetailView(si);
         }
 

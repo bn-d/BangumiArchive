@@ -27,9 +27,7 @@ namespace BangumiArchive.UIModule
         /// <summary>
         /// Add new series to to-watch list
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private async void AddToWatchClickAsync(object sender, RoutedEventArgs e)
+        public static async void AddToWatchClickAsync()
         {
             // Show input dialog to get the new Series name
             var dialog = new InputDialog("Add To-Watch Series");
@@ -38,8 +36,10 @@ namespace BangumiArchive.UIModule
             if (result != ContentDialogResult.Primary) return;
 
             // Create new Series
-            string name = dialog.Text;
-            DataManager.ToWatch.Add(name);
+            var si = DataManager.ToWatch.Add(dialog.Text);
+
+            // Display the Series' details
+            MainPage.NavigateDetailView(si);
         }
 
         /// <summary>

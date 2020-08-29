@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using Windows.System;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using TextBox = Windows.UI.Xaml.Controls.TextBox;
 
@@ -84,17 +82,13 @@ namespace BangumiArchive.UIModule
         }
 
         /// <summary>
-        /// Allow only digit in text box
+        /// Only allow digit in text box
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public static void OnlyDigitKeyDown(object sender, KeyRoutedEventArgs e)
+        public static void OnlyDigitBeforeTextChanging(TextBox sender, TextBoxBeforeTextChangingEventArgs e)
         {
-            if ((e.Key < VirtualKey.NumberPad0 || e.Key > VirtualKey.NumberPad9) &
-                (e.Key < VirtualKey.Number0 || e.Key > VirtualKey.Number9))
-            {
-                e.Handled = true;
-            }
+            e.Cancel = e.NewText.Any(c => !char.IsDigit(c));
         }
 
         /// <summary>
